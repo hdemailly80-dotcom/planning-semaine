@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planning de la semaine</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #F0F4F1;
+    min-height: 100vh;
+    padding: 20px 12px 40px;
+    color: #2C3E35;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2C3E35;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    font-size: 0.85rem;
+    color: #6B8070;
+    margin-top: 4px;
+  }
+
+  .week-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .week-nav button {
+    background: #3D5A80;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .week-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #3D5A80;
+    min-width: 200px;
+    text-align: center;
+  }
+
+  .days-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .day-card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  .day-header {
+    background: #3D5A80;
+    color: white;
+    padding: 8px 14px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .day-date {
+    font-size: 0.75rem;
+    opacity: 0.75;
+    font-weight: 400;
+  }
+
+  .meals {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .meal-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .meal-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6B8070;
+  }
+
+  .location-btns {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .loc-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 2px solid #D0DDD5;
+    background: white;
+    color: #4A6055;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .loc-btn:hover { border-color: #3D5A80; color: #3D5A80; }
+
+  .loc-btn.selected-maison {
+    background: #7AAB8A;
+    border-color: #7AAB8A;
+    color: white;
+  }
+  .loc-btn.selected-amiens {
+    background: #3D5A80;
+    border-color: #3D5A80;
+    color: white;
+  }
+  .loc-btn.selected-autre {
+    background: #E07B54;
+    border-color: #E07B54;
+    color: white;
+  }
+
+  .maison-detail {
+    display: none;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+    padding: 8px 10px;
+    background: #F0F7F2;
+    border-radius: 10px;
+    border-left: 3px solid #7AAB8A;
+  }
+
+  .maison-detail.visible { display: flex; }
+
+  .who-btn {
+    padding: 5px 12px;
+    border-radius: 16px;
+    border: 2px solid #7AAB8A;
+    background: white;
+    color: #3D6B4F;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .who-btn.selected {
+    background: #3D6B4F;
+    border-color: #3D6B4F;
+    color: white;
+  }
+
+  .divider {
+    height: 1px;
+    background: #EDF2EE;
+    margin: 2px 0;
+  }
+
+  /* WhatsApp section */
+  .send-section {
+    max-width: 540px;
+    margin: 22px auto 0;
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  .send-section h2 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2C3E35;
+    margin-bottom: 12px;
+  }
+
+  .phone-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .phone-input input {
+    flex: 1;
+    padding: 9px 12px;
+    border: 2px solid #D0DDD5;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #2C3E35;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .phone-input input:focus { border-color: #3D5A80; }
+
+  .phone-hint {
+    font-size: 0.72rem;
+    color: #6B8070;
+    margin-bottom: 12px;
+    margin-top: -6px;
+  }
+
+  .btn-whatsapp {
+    width: 100%;
+    padding: 13px;
+    background: #25D366;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s;
+  }
+  .btn-whatsapp:hover { background: #1ebe59; }
+  .btn-whatsapp:disabled { background: #A8D5B5; cursor: not-allowed; }
+
+  .btn-reset {
+    width: 100%;
+    margin-top: 8px;
+    padding: 9px;
+    background: transparent;
+    color: #6B8070;
+    border: 1px solid #D0DDD5;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  .wa-icon { font-size: 1.2rem; }
+
+  .progress-bar {
+    background: #E8F0EA;
+    border-radius: 6px;
+    height: 6px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .progress-fill {
+    background: #7AAB8A;
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.3s;
+  }
+  .progress-label {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #6B8070;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📅 Planning de la semaine</h1>
+  <p>Indiquez où vous serez pour chaque repas</p>
+</header>
+
+<div class="week-nav">
+  <button onclick="changeWeek(-1)">‹</button>
+  <div class="week-label" id="weekLabel"></div>
+  <button onclick="changeWeek(1)">›</button>
+</div>
+
+<div class="progress-label" id="progressLabel">0 / 14 repas renseignés</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+<div class="days-grid" id="daysGrid"></div>
+
+<div class="send-section">
+  <h2>📤 Envoyer le récapitulatif</h2>
+  <div class="phone-input">
+    <input type="tel" id="phoneInput" placeholder="336XXXXXXXX" />
+  </div>
+  <p class="phone-hint">Numéro avec indicatif, sans + ni espaces (ex: 33612345678)</p>
+  <button class="btn-whatsapp" onclick="sendWhatsApp()" id="sendBtn">
+    <span class="wa-icon">💬</span> Envoyer sur WhatsApp
+  </button>
+  <button class="btn-reset" onclick="resetAll()">🔄 Réinitialiser</button>
+</div>
+
+<script>
+const DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const LOCATIONS = ['Maison','Amiens','Autre'];
+const MEALS = ['Midi','Soir'];
+
+// State
+let weekOffset = 1; // default: next week
+let selections = {}; // key: "dayIndex_meal" => {loc, who}
+
+function getSundayOfWeek(offset) {
+  const today = new Date();
+  const day = today.getDay(); // 0=Sun
+  const diffToSunday = (offset * 7) - day;
+  const sun = new Date(today);
+  sun.setDate(today.getDate() + diffToSunday);
+  sun.setHours(0,0,0,0);
+  return sun;
+}
+
+function formatDate(d) {
+  return `${d.getDate()} ${MONTHS_FR[d.getMonth()]}`;
+}
+
+function changeWeek(dir) {
+  weekOffset += dir;
+  if (weekOffset < 0) weekOffset = 0;
+  render();
+}
+
+function getKey(dayIdx, meal) { return `${weekOffset}_${dayIdx}_${meal}`; }
+
+function selectLocation(dayIdx, meal, loc) {
+  const key = getKey(dayIdx, meal);
+  if (!selections[key]) selections[key] = {};
+  selections[key].loc = loc;
+  if (loc !== 'Maison') delete selections[key].who;
+  render();
+}
+
+function selectWho(dayIdx, meal, who) {
+  const key = getKey(dayIdx, meal);
+  if (!selections[key]) selections[key] = {};
+  selections[key].who = who;
+  render();
+}
+
+function countFilled() {
+  let count = 0;
+  const sun = getSundayOfWeek(weekOffset);
+  for (let d = 0; d < 7; d++) {
+    for (const meal of MEALS) {
+      const key = getKey(d, meal);
+      const s = selections[key];
+      if (s && s.loc) {
+        if (s.loc === 'Maison' && !s.who) continue;
+        count++;
+      }
+    }
+  }
+  return count;
+}
+
+function render() {
+  const sun = getSundayOfWeek(weekOffset);
+  const endSat = new Date(sun); endSat.setDate(sun.getDate() + 6);
+
+  // Week label
+  const isSameMonth = sun.getMonth() === endSat.getMonth();
+  const label = isSameMonth
+    ? `${sun.getDate()} – ${endSat.getDate()} ${MONTHS_FR[endSat.getMonth()]} ${endSat.getFullYear()}`
+    : `${formatDate(sun)} – ${formatDate(endSat)} ${endSat.getFullYear()}`;
+  document.getElementById('weekLabel').textContent = label;
+
+  // Progress
+  const filled = countFilled();
+  document.getElementById('progressLabel').textContent = `${filled} / 14 repas renseignés`;
+  document.getElementById('progressFill').style.width = `${Math.round(filled/14*100)}%`;
+
+  // Grid
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = '';
+
+  for (let d = 0; d < 7; d++) {
+    const date = new Date(sun); date.setDate(sun.getDate() + d);
+    const card = document.createElement('div');
+    card.className = 'day-card';
+
+    let mealsHTML = '';
+    for (let m = 0; m < MEALS.length; m++) {
+      const meal = MEALS[m];
+      const key = getKey(d, meal);
+      const sel = selections[key] || {};
+
+      const locBtns = LOCATIONS.map(loc => {
+        const cls = sel.loc === loc ? `loc-btn selected-${loc.toLowerCase()}` : 'loc-btn';
+        return `<button class="${cls}" onclick="selectLocation(${d},'${meal}','${loc}')">${loc}</button>`;
+      }).join('');
+
+      const showDetail = sel.loc === 'Maison';
+      const whoSeule = sel.who === 'Seule' ? 'selected' : '';
+      const whoA2 = sel.who === 'À 2' ? 'selected' : '';
+
+      const detailHTML = `
+        <div class="maison-detail ${showDetail ? 'visible' : ''}">
+          <button class="who-btn ${whoSeule}" onclick="selectWho(${d},'${meal}','Seule')">👤 Seule</button>
+          <button class="who-btn ${whoA2}" onclick="selectWho(${d},'${meal}','À 2')">👥 À 2</button>
+        </div>`;
+
+      mealsHTML += `
+        ${m > 0 ? '<div class="divider"></div>' : ''}
+        <div class="meal-row">
+          <div class="meal-label">${meal}</div>
+          <div class="location-btns">${locBtns}</div>
+          ${detailHTML}
+        </div>`;
+    }
+
+    card.innerHTML = `
+      <div class="day-header">
+        ${DAYS_FR[date.getDay()]}
+        <span class="day-date">${formatDate(date)}</span>
+      </div>
+      <div class="meals">${mealsHTML}</div>
+    `;
+    grid.appendChild(card);
+  }
+}
+
+function buildMessage() {
+  const sun = getSundayOfWeek(weekOffset);
+  const endSat = new Date(sun); endSat.setDate(sun.getDate() + 6);
+
+  let msg = `📅 Planning semaine du ${formatDate(sun)} au ${formatDate(endSat)}\n`;
+  msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
+
+  for (let d = 0; d < 7; d++) {
+    const date = new Date(sun); date.setDate(sun.getDate() + d);
+    const dayName = DAYS_FR[date.getDay()];
+    const dayStr = `${dayName} ${date.getDate()}/${date.getMonth()+1}`;
+
+    let hasEntry = false;
+    let dayLine = `\n*${dayStr}*\n`;
+
+    for (const meal of MEALS) {
+      const key = getKey(d, meal);
+      const sel = selections[key] || {};
+      const icon = meal === 'Midi' ? '🌞' : '🌙';
+
+      if (sel.loc) {
+        let detail = sel.loc;
+        if (sel.loc === 'Maison' && sel.who) {
+          detail = `Maison (${sel.who})`;
+        } else if (sel.loc === 'Maison') {
+          detail = `Maison`;
+        }
+        dayLine += `  ${icon} ${meal} : ${detail}\n`;
+        hasEntry = true;
+      } else {
+        dayLine += `  ${icon} ${meal} : —\n`;
+        hasEntry = true;
+      }
+    }
+
+    msg += dayLine;
+  }
+
+  return msg.trim();
+}
+
+function sendWhatsApp() {
+  const phone = document.getElementById('phoneInput').value.trim().replace(/\D/g,'');
+  if (!phone) { alert('Merci de saisir un numéro WhatsApp.'); return; }
+
+  const msg = buildMessage();
+  const encoded = encodeURIComponent(msg);
+  const url = `https://wa.me/${phone}?text=${encoded}`;
+  window.open(url, '_blank');
+}
+
+function resetAll() {
+  if (confirm('Réinitialiser toutes les sélections ?')) {
+    selections = {};
+    render();
+  }
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
