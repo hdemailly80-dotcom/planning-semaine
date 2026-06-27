@@ -231,6 +231,20 @@
     margin-top: -6px;
   }
 
+  .copy-btn {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 2px solid #D0DDD5;
+    background: white;
+    color: #4A6055;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .copy-btn:hover { border-color: #3D5A80; }
+  .copy-btn.copied { background: #7AAB8A; border-color: #7AAB8A; color: white; }
+
   .btn-whatsapp {
     width: 100%;
     padding: 13px;
@@ -264,7 +278,51 @@
 
   .wa-icon { font-size: 1.2rem; }
 
-  .progress-bar {
+  .author-section {
+    max-width: 540px;
+    margin: 0 auto 20px;
+    background: white;
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  .author-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6B8070;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+
+  .author-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .author-btn {
+    padding: 8px 18px;
+    border-radius: 22px;
+    border: 2px solid #D0DDD5;
+    background: white;
+    color: #4A6055;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .author-btn:hover { border-color: #3D5A80; color: #3D5A80; }
+
+  .author-btn.selected {
+    background: #3D5A80;
+    border-color: #3D5A80;
+    color: white;
+  }
+
+
     background: #E8F0EA;
     border-radius: 6px;
     height: 6px;
@@ -295,6 +353,16 @@
   <p>Indiquez où vous serez pour chaque repas</p>
 </header>
 
+<div class="author-section" id="authorSection">
+  <div class="author-label">Qui remplit ce planning ?</div>
+  <div class="author-btns">
+    <button class="author-btn" onclick="selectAuthor('Jeanne')">🧒 Jeanne</button>
+    <button class="author-btn" onclick="selectAuthor('Louis')">🧒 Louis</button>
+    <button class="author-btn" onclick="selectAuthor('Papa')">👨 Papa</button>
+    <button class="author-btn" onclick="selectAuthor('Maman')">👩 Maman</button>
+  </div>
+</div>
+
 <div class="week-nav">
   <button onclick="changeWeek(-1)">‹</button>
   <div class="week-label" id="weekLabel"></div>
@@ -309,9 +377,10 @@
 <div class="send-section">
   <h2>📤 Envoyer le récapitulatif</h2>
   <div class="phone-input">
-    <input type="tel" id="phoneInput" placeholder="336XXXXXXXX" />
+    <input type="tel" id="phoneInput" value="33679815801" />
+    <button class="copy-btn" onclick="copyPhone()" id="copyBtn" title="Copier le numéro">📋</button>
   </div>
-  <p class="phone-hint">Numéro avec indicatif, sans + ni espaces (ex: 33612345678)</p>
+  <p class="phone-hint" id="copyHint">+33 6 79 81 58 01</p>
   <button class="btn-whatsapp" onclick="sendWhatsApp()" id="sendBtn">
     <span class="wa-icon">💬</span> Envoyer sur WhatsApp
   </button>
@@ -325,8 +394,16 @@ const LOCATIONS = ['Maison','Amiens','Autre'];
 const MEALS = ['Midi','Soir'];
 
 // State
-let weekOffset = 1; // default: next week
-let selections = {}; // key: "dayIndex_meal" => {loc, who}
+let weekOffset = 1;
+let selections = {};
+let author = '';
+
+function selectAuthor(name) {
+  author = name;
+  document.querySelectorAll('.author-btn').forEach(b => {
+    b.classList.toggle('selected', b.textContent.includes(name));
+  });
+}
 
 function getSundayOfWeek(offset) {
   const today = new Date();
@@ -451,7 +528,7 @@ function buildMessage() {
   const sun = getSundayOfWeek(weekOffset);
   const endSat = new Date(sun); endSat.setDate(sun.getDate() + 6);
 
-  let msg = `📅 Planning semaine du ${formatDate(sun)} au ${formatDate(endSat)}\n`;
+  let msg = `📅 Planning de ${author} – semaine du ${formatDate(sun)} au ${formatDate(endSat)}\n`;
   msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
 
   for (let d = 0; d < 7; d++) {
@@ -488,7 +565,24 @@ function buildMessage() {
   return msg.trim();
 }
 
+function copyPhone() {
+  const val = document.getElementById('phoneInput').value;
+  navigator.clipboard.writeText('+' + val).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const hint = document.getElementById('copyHint');
+    btn.classList.add('copied');
+    btn.textContent = '✅';
+    hint.textContent = 'Numéro copié !';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '📋';
+      hint.textContent = '+33 6 79 81 58 01';
+    }, 2000);
+  });
+}
+
 function sendWhatsApp() {
+  if (!author) { alert('Merci de choisir qui remplit ce planning.'); return; }
   const phone = document.getElementById('phoneInput').value.trim().replace(/\D/g,'');
   if (!phone) { alert('Merci de saisir un numéro WhatsApp.'); return; }
 
@@ -501,6 +595,8 @@ function sendWhatsApp() {
 function resetAll() {
   if (confirm('Réinitialiser toutes les sélections ?')) {
     selections = {};
+    author = '';
+    document.querySelectorAll('.author-btn').forEach(b => b.classList.remove('selected'));
     render();
   }
 }
