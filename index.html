@@ -3,500 +3,821 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Planning de la semaine</title>
+<title>Planning Repas Famille</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Lato:wght@400;700&display=swap');
+
+  :root {
+    --vert: #3d8b6e;
+    --vert-clair: #e8f5ef;
+    --vert-moyen: #c2e0d2;
+    --orange: #e8824a;
+    --orange-clair: #fdf0e8;
+    --bleu: #3a6ea5;
+    --bleu-clair: #e8f0fa;
+    --gris: #f4f5f7;
+    --gris-bord: #dde1e7;
+    --texte: #2c3344;
+    --texte-léger: #6b7585;
+    --blanc: #ffffff;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: #F0F4F1; min-height: 100vh;
-    padding: 20px 12px 40px; color: #2C3E35;
-  }
-  header { text-align: center; margin-bottom: 24px; }
-  header h1 { font-size: 1.5rem; font-weight: 700; color: #2C3E35; letter-spacing: -0.5px; }
-  header p { font-size: 0.85rem; color: #6B8070; margin-top: 4px; }
-
-  .author-section {
-    max-width: 540px; margin: 0 auto 20px; background: white;
-    border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-  }
-  .author-label { font-size: 0.85rem; font-weight: 600; color: #6B8070; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
-  .author-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-  .author-btn {
-    padding: 8px 18px; border-radius: 22px; border: 2px solid #D0DDD5;
-    background: white; color: #4A6055; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
-  }
-  .author-btn:hover { border-color: #3D5A80; color: #3D5A80; }
-  .author-btn.selected { background: #3D5A80; border-color: #3D5A80; color: white; }
-
-  .week-nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 22px; }
-  .week-nav button {
-    background: #3D5A80; color: white; border: none; border-radius: 8px;
-    width: 36px; height: 36px; font-size: 1.1rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .week-label { font-size: 0.95rem; font-weight: 600; color: #3D5A80; min-width: 200px; text-align: center; }
-
-  .progress-label { text-align: center; font-size: 0.75rem; color: #6B8070; margin-bottom: 8px; }
-  .progress-bar {
-    background: #E8F0EA; border-radius: 6px; height: 6px;
-    margin-bottom: 16px; overflow: hidden; max-width: 540px; margin-left: auto; margin-right: auto;
-  }
-  .progress-fill { background: #7AAB8A; height: 100%; border-radius: 6px; transition: width 0.3s; }
-
-  .days-grid { display: flex; flex-direction: column; gap: 10px; max-width: 540px; margin: 0 auto; }
-  .day-card { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-  .day-header {
-    background: #3D5A80; color: white; padding: 8px 14px;
-    font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
-  }
-  .day-date { font-size: 0.75rem; opacity: 0.75; font-weight: 400; }
-  .meals { padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; }
-  .meal-row { display: flex; flex-direction: column; gap: 6px; }
-  .meal-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #6B8070; }
-  .divider { height: 1px; background: #EDF2EE; margin: 2px 0; }
-
-  .location-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-  .loc-btn {
-    padding: 6px 14px; border-radius: 20px; border: 2px solid #D0DDD5;
-    background: white; color: #4A6055; font-size: 0.82rem; font-weight: 500;
-    cursor: pointer; transition: all 0.15s; white-space: nowrap;
-  }
-  .loc-btn:hover { border-color: #3D5A80; color: #3D5A80; }
-  .loc-btn.sel-maison  { background: #7AAB8A; border-color: #7AAB8A; color: white; }
-  .loc-btn.sel-amiens  { background: #3D5A80; border-color: #3D5A80; color: white; }
-  .loc-btn.sel-lycee   { background: #3D5A80; border-color: #3D5A80; color: white; }
-  .loc-btn.sel-autre   { background: #E07B54; border-color: #E07B54; color: white; }
-
-  .sub-detail {
-    display: none; gap: 6px; flex-wrap: wrap; margin-top: 4px;
-    padding: 8px 10px; border-radius: 10px;
-  }
-  .sub-detail.visible { display: flex; }
-  .sub-detail.green  { background: #F0F7F2; border-left: 3px solid #7AAB8A; flex-direction: column; }
-  .sub-detail.orange { background: #FEF4EF; border-left: 3px solid #E07B54; flex-direction: column; }
-
-  .sub-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-
-  .sub-btn {
-    padding: 5px 12px; border-radius: 16px; border: 2px solid;
-    background: white; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
-  }
-  .sub-btn.green-theme { border-color: #7AAB8A; color: #3D6B4F; }
-  .sub-btn.green-theme.selected { background: #3D6B4F; border-color: #3D6B4F; color: white; }
-  .sub-btn.orange-theme { border-color: #E07B54; color: #C0582A; }
-  .sub-btn.orange-theme.selected { background: #E07B54; border-color: #E07B54; color: white; }
-
-  .free-input {
-    flex: 1; min-width: 140px; padding: 5px 10px;
-    border: 2px solid #E07B54; border-radius: 16px;
-    font-size: 0.8rem; color: #2C3E35; outline: none;
-    background: white;
-  }
-  .free-input:focus { border-color: #C0582A; }
-  .free-input::placeholder { color: #bbb; }
-
-  .sub-section-label {
-    font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.4px; color: #888; margin-bottom: 2px;
+    font-family: 'Lato', sans-serif;
+    background: #f0f4f8;
+    color: var(--texte);
+    min-height: 100vh;
   }
 
-  /* Envoi */
-  .send-section {
-    max-width: 540px; margin: 22px auto 0; background: white;
-    border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  header {
+    background: var(--vert);
+    color: white;
+    padding: 20px 24px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(61,139,110,0.3);
   }
-  .send-section h2 { font-size: 0.9rem; font-weight: 600; color: #2C3E35; margin-bottom: 12px; }
-  .send-btns { display: flex; flex-direction: column; gap: 8px; }
-  .phone-input { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
-  .phone-input input {
-    flex: 1; padding: 9px 12px; border: 2px solid #D0DDD5; border-radius: 10px;
-    font-size: 0.9rem; color: #2C3E35; outline: none; transition: border-color 0.15s;
-  }
-  .phone-input input:focus { border-color: #3D5A80; }
-  .copy-btn {
-    padding: 8px 12px; border-radius: 10px; border: 2px solid #D0DDD5;
-    background: white; color: #4A6055; font-size: 1rem; cursor: pointer; transition: all 0.15s;
-  }
-  .copy-btn:hover { border-color: #3D5A80; }
-  .copy-btn.copied { background: #7AAB8A; border-color: #7AAB8A; color: white; }
-  .phone-hint { font-size: 0.72rem; color: #6B8070; margin-bottom: 10px; }
 
-  .btn-whatsapp {
-    width: 100%; padding: 13px; background: #25D366; color: white; border: none;
-    border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s;
+  header .logo { font-size: 28px; }
+  header h1 { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.3px; }
+  header p { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* Sélecteur de personne */
+  .card {
+    background: var(--blanc);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px 22px;
+    margin-bottom: 20px;
   }
-  .btn-whatsapp:hover { background: #1ebe59; }
-  .btn-sheets {
-    width: 100%; padding: 13px; background: #34A853; color: white; border: none;
-    border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s;
+
+  .card-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--vert);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .btn-sheets:hover { background: #2d9148; }
-  .btn-sheets:disabled { background: #9dcfaa; cursor: not-allowed; }
-  .btn-reset {
-    width: 100%; margin-top: 4px; padding: 9px; background: transparent;
-    color: #6B8070; border: 1px solid #D0DDD5; border-radius: 10px; font-size: 0.85rem; cursor: pointer;
+
+  .personne-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
   }
-  .status-msg {
-    font-size: 0.82rem; text-align: center; padding: 8px;
-    border-radius: 8px; display: none; margin-top: 6px;
+
+  .personne-btn {
+    border: 2px solid var(--gris-bord);
+    background: var(--gris);
+    border-radius: 10px;
+    padding: 14px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--texte-léger);
   }
-  .status-msg.ok  { background: #E8F7ED; color: #2d7a47; display: block; }
-  .status-msg.err { background: #FEE8E8; color: #c0392b; display: block; }
+
+  .personne-btn .emoji { font-size: 24px; display: block; margin-bottom: 6px; }
+  .personne-btn:hover { border-color: var(--vert); color: var(--vert); background: var(--vert-clair); }
+  .personne-btn.actif { border-color: var(--vert); background: var(--vert-clair); color: var(--vert); }
+
+  /* Sélecteur de semaine */
+  .semaine-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .semaine-nav button {
+    background: var(--gris);
+    border: 1px solid var(--gris-bord);
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.15s;
+  }
+
+  .semaine-nav button:hover { background: var(--vert-moyen); }
+
+  #semaine-label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--texte);
+    flex: 1;
+    text-align: center;
+  }
+
+  /* Calendrier / tableau repas */
+  .tableau-repas { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+  .tableau-repas thead tr th {
+    padding: 10px 8px;
+    background: var(--vert);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .tableau-repas thead tr th:first-child { border-radius: 8px 0 0 0; }
+  .tableau-repas thead tr th:last-child { border-radius: 0 8px 0 0; }
+
+  .tableau-repas tbody tr { border-bottom: 1px solid var(--gris-bord); }
+  .tableau-repas tbody tr:nth-child(odd) { background: var(--blanc); }
+  .tableau-repas tbody tr:nth-child(even) { background: var(--gris); }
+  .tableau-repas tbody tr.dimanche-row { background: var(--vert-clair) !important; }
+  .tableau-repas tbody tr.samedi-row { background: var(--bleu-clair) !important; }
+
+  .tableau-repas td { padding: 10px 8px; vertical-align: top; }
+
+  .jour-label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .date-label {
+    font-size: 11px;
+    color: var(--texte-léger);
+    margin-top: 2px;
+  }
+
+  .moment-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: 6px;
+  }
+
+  .badge-midi { background: #fff3cd; color: #7a5c00; }
+  .badge-soir { background: #d4e6ff; color: #1a4a8a; }
+
+  /* Sélecteurs de repas */
+  .repas-select {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .choix-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .choix-btn {
+    border: 1.5px solid var(--gris-bord);
+    background: var(--blanc);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--texte-léger);
+    font-family: 'Lato', sans-serif;
+  }
+
+  .choix-btn:hover { border-color: var(--vert); color: var(--vert); }
+
+  .choix-btn.sel-maison { background: var(--vert); border-color: var(--vert); color: white; }
+  .choix-btn.sel-lycee { background: var(--bleu); border-color: var(--bleu); color: white; }
+  .choix-btn.sel-amiens { background: var(--orange); border-color: var(--orange); color: white; }
+  .choix-btn.sel-autre { background: #7a5c9a; border-color: #7a5c9a; color: white; }
+
+  .sous-choix {
+    display: none;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 4px;
+    padding: 6px 8px;
+    background: var(--gris);
+    border-radius: 8px;
+    border-left: 3px solid var(--gris-bord);
+  }
+
+  .sous-choix.visible { display: flex; }
+
+  .sous-btn {
+    border: 1.5px solid var(--gris-bord);
+    background: var(--blanc);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--texte-léger);
+  }
+
+  .sous-btn.sel-gamelle { background: #e07b00; border-color: #e07b00; color: white; }
+  .sous-btn.sel-sandwich { background: #c05050; border-color: #c05050; color: white; }
+  .sous-btn.sel-rien { background: #888; border-color: #888; color: white; }
+
+  .jeanne-compagnie {
+    display: none;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 4px;
+    padding: 6px 8px;
+    background: #fce8f5;
+    border-radius: 8px;
+    border-left: 3px solid #d070b0;
+  }
+
+  .jeanne-compagnie.visible { display: flex; }
+
+  .compagnie-label { font-size: 11px; color: #a0407a; font-weight: 700; width: 100%; margin-bottom: 2px; }
+
+  .sous-btn.sel-seule { background: #d070b0; border-color: #d070b0; color: white; }
+  .sous-btn.sel-baptiste { background: #9030a0; border-color: #9030a0; color: white; }
+
+  /* Bouton soumettre */
+  .btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: var(--vert);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.18s, transform 0.1s;
+    box-shadow: 0 4px 14px rgba(61,139,110,0.35);
+  }
+
+  .btn-submit:hover { background: #2f7057; transform: translateY(-1px); }
+  .btn-submit:active { transform: translateY(0); }
+
+  /* Résultat */
+  #result-panel {
+    display: none;
+    background: var(--blanc);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-top: 20px;
+    border-top: 4px solid var(--vert);
+  }
+
+  #result-panel h2 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--vert);
+    margin-bottom: 16px;
+  }
+
+  .action-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .btn-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    text-decoration: none;
+  }
+
+  .btn-action:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .btn-whatsapp { background: #25d366; color: white; }
+  .btn-mail { background: var(--bleu); color: white; }
+  .btn-nouveau { background: var(--gris); color: var(--texte); border: 1.5px solid var(--gris-bord); }
+
+  .msg-envoi {
+    background: var(--vert-clair);
+    border: 1px solid var(--vert-moyen);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--texte);
+    margin-top: 12px;
+  }
+
+  /* Pastille statut envoi */
+  .statut {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    display: inline-block;
+    margin-left: 8px;
+  }
+
+  .statut-ok { background: #d4edda; color: #1a6b32; }
+  .statut-err { background: #fde8e8; color: #a02020; }
+  .statut-attente { background: #fff3cd; color: #7a5c00; }
+
+  /* État chargement */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 30px;
+    color: var(--texte-léger);
+    font-size: 15px;
+  }
+
+  .spinner {
+    width: 36px; height: 36px;
+    border: 4px solid var(--vert-moyen);
+    border-top-color: var(--vert);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Alerte aucune personne */
+  .alerte {
+    background: #fff3cd;
+    border: 1px solid #ffd966;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #7a5c00;
+    display: none;
+    margin-top: 10px;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .personne-grid { grid-template-columns: repeat(2, 1fr); }
+    .tableau-repas { font-size: 12px; }
+    .choix-btn { font-size: 11px; padding: 4px 9px; }
+    header h1 { font-size: 18px; }
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>📅 Planning de la semaine</h1>
-  <p>Indiquez où vous serez pour chaque repas</p>
+  <div class="logo">🍽️</div>
+  <div>
+    <h1>Planning Repas</h1>
+    <p>Famille Demailly — Saisis tes repas pour la semaine</p>
+  </div>
 </header>
 
-<div class="author-section">
-  <div class="author-label">Qui remplit ce planning ?</div>
-  <div class="author-btns">
-    <button class="author-btn" onclick="selectAuthor('Jeanne')">🧒 Jeanne</button>
-    <button class="author-btn" onclick="selectAuthor('Louis')">🧒 Louis</button>
-    <button class="author-btn" onclick="selectAuthor('Papa')">👨 Papa</button>
-    <button class="author-btn" onclick="selectAuthor('Maman')">👩 Maman</button>
+<div class="container">
+
+  <!-- Choix de la personne -->
+  <div class="card">
+    <div class="card-title">👤 Qui remplit ce formulaire ?</div>
+    <div class="personne-grid">
+      <div class="personne-btn" data-personne="Papa" onclick="choisirPersonne(this)">
+        <span class="emoji">👨</span>Papa
+      </div>
+      <div class="personne-btn" data-personne="Louis" onclick="choisirPersonne(this)">
+        <span class="emoji">🧑</span>Louis
+      </div>
+      <div class="personne-btn" data-personne="Jeanne" onclick="choisirPersonne(this)">
+        <span class="emoji">👧</span>Jeanne
+      </div>
+      <div class="personne-btn" data-personne="Maman" onclick="choisirPersonne(this)">
+        <span class="emoji">👩</span>Maman
+      </div>
+    </div>
+    <div class="alerte" id="alerte-personne">⚠️ Merci de choisir qui remplit le formulaire avant de continuer.</div>
   </div>
-</div>
 
-<div class="week-nav">
-  <button onclick="changeWeek(-1)">‹</button>
-  <div class="week-label" id="weekLabel"></div>
-  <button onclick="changeWeek(1)">›</button>
-</div>
-
-<div class="progress-label" id="progressLabel">0 / 14 repas renseignés</div>
-<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-
-<div class="days-grid" id="daysGrid"></div>
-
-<div class="send-section">
-  <h2>📤 Envoyer le récapitulatif</h2>
-  <div class="phone-input">
-    <input type="tel" id="phoneInput" value="33679815801" />
-    <button class="copy-btn" onclick="copyPhone()" id="copyBtn">📋</button>
+  <!-- Sélection de la semaine -->
+  <div class="card">
+    <div class="card-title">📅 Semaine à planifier</div>
+    <div class="semaine-nav">
+      <button onclick="changerSemaine(-1)" title="Semaine précédente">◀</button>
+      <span id="semaine-label">—</span>
+      <button onclick="changerSemaine(1)" title="Semaine suivante">▶</button>
+    </div>
   </div>
-  <p class="phone-hint" id="copyHint">+33 6 79 81 58 01</p>
-  <div class="send-btns">
-    <button class="btn-whatsapp" onclick="sendWhatsApp()">💬 Envoyer sur WhatsApp</button>
-    <button class="btn-sheets"   onclick="sendSheets()">📊 Envoyer vers Google Sheets</button>
-    <button class="btn-reset"    onclick="resetAll()">🔄 Réinitialiser</button>
+
+  <!-- Tableau des repas -->
+  <div class="card" id="tableau-card">
+    <div class="card-title">🗓️ Repas de la semaine</div>
+    <div style="overflow-x:auto;">
+      <table class="tableau-repas">
+        <thead>
+          <tr>
+            <th style="width:110px">Jour</th>
+            <th>Midi</th>
+            <th>Soir</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-repas">
+          <!-- Rempli dynamiquement -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alerte" id="alerte-repas" style="margin-top:14px;">⚠️ Merci de renseigner tous les repas avant d'envoyer.</div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      Envoi en cours…
+    </div>
+
+    <button class="btn-submit" onclick="soumettre()">✅ Envoyer mon planning</button>
   </div>
-  <div class="status-msg" id="statusMsg"></div>
+
+  <!-- Panneau résultat -->
+  <div id="result-panel">
+    <h2>✅ Planning envoyé avec succès !</h2>
+    <p id="result-msg" style="font-size:14px;color:var(--texte-léger);"></p>
+
+    <div class="msg-envoi" id="msg-envoi-txt"></div>
+
+    <div class="action-btns">
+      <a id="btn-wa" href="#" target="_blank" class="btn-action btn-whatsapp" onclick="ouvrirWA(event)">
+        💬 Envoyer sur WhatsApp
+      </a>
+      <button class="btn-action btn-mail" onclick="envoyerMail()">
+        📧 Notifier par mail
+      </button>
+      <button class="btn-action btn-nouveau" onclick="recommencer()">
+        🔄 Nouveau formulaire
+      </button>
+    </div>
+
+    <div id="statuts-envoi" style="margin-top:14px;font-size:13px;"></div>
+  </div>
+
 </div>
 
 <script>
-const DAYS_FR   = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-const MEALS     = ['Midi','Soir'];
+// ─── CONFIG ─────────────────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxc8WqxRi5AI4k9ps5X18KbrDo8ari-o79KPKLKZpZYj7TEQ_-YEWsfKOItOyT48XcS/exec";
+const WA_NUMERO = "+33679815801";
+const MAIL_NOTIF = "cindy.demailly.cd@gmail.com";
 
-// URL du Apps Script déployé — à remplacer après déploiement
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxFg7TGb9K-uX5OX7EsfsLKASqPKZ0oVGozrbSKG7St5DBEeKKfZOHFAw20gNu1Tp3/exec';
+// ─── ÉTAT GLOBAL ─────────────────────────────────────────────────────────────
+let personneActive = null;
+let offsetSemaine = 1; // par défaut semaine suivante
+let donneesRepas = {}; // clé: "dimanche-midi", valeur: {lieu, sousChoix, compagnie}
 
-// Profils
-// who     : lieux qui déclenchent seul/à2
-// gamelle : lieux qui déclenchent gamelle/sandwich/libre
-const PROFILES = {
-  Jeanne: { locs: ['Maison','Amiens','Autre'], who: ['Maison','Amiens','Autre'], gamelle: ['Autre'] },
-  Louis:  { locs: ['Maison','Lycée','Autre'],  who: [],                          gamelle: ['Autre'] },
-  Papa:   { locs: ['Maison','Lycée','Autre'],  who: [],                          gamelle: ['Autre'] },
-  Maman:  { locs: ['Maison','Lycée','Autre'],  who: [],                          gamelle: ['Autre'] },
-};
+// ─── JOURS ───────────────────────────────────────────────────────────────────
+const JOURS = [
+  { id: "dimanche", label: "Dimanche",  court: "Dim", cls: "dimanche-row" },
+  { id: "lundi",    label: "Lundi",     court: "Lun", cls: "" },
+  { id: "mardi",    label: "Mardi",     court: "Mar", cls: "" },
+  { id: "mercredi", label: "Mercredi",  court: "Mer", cls: "" },
+  { id: "jeudi",    label: "Jeudi",     court: "Jeu", cls: "" },
+  { id: "vendredi", label: "Vendredi",  court: "Ven", cls: "" },
+  { id: "samedi",   label: "Samedi",    court: "Sam", cls: "samedi-row" },
+];
 
-const WHO_OPTIONS     = ['Seule / Seul', 'À 2'];
-const GAMELLE_OPTIONS = ['Gamelle froide', 'Sandwich'];
+const MOMENTS = ["midi", "soir"];
 
-let weekOffset = 1;
-let selections = {};
-let author = '';
-
-function profile() { return author ? PROFILES[author] : null; }
-
-/* ── Auteur ── */
-function selectAuthor(name) {
-  author = name;
-  document.querySelectorAll('.author-btn').forEach(b =>
-    b.classList.toggle('selected', b.textContent.includes(name))
-  );
-  selections = {};
-  render();
+// ─── SEMAINE ─────────────────────────────────────────────────────────────────
+function getDimancheOffset(offset) {
+  const auj = new Date();
+  const jourSemaine = auj.getDay(); // 0 = dimanche
+  // Prochain dimanche si on n'est pas dimanche, sinon dimanche actuel
+  const diffVersDimanche = jourSemaine === 0 ? 0 : (7 - jourSemaine);
+  const d = new Date(auj);
+  d.setDate(auj.getDate() + diffVersDimanche + (offset - 1) * 7);
+  d.setHours(0, 0, 0, 0);
+  return d;
 }
 
-/* ── Semaine ── */
-function getSundayOfWeek(offset) {
-  const today = new Date();
-  const sun = new Date(today);
-  sun.setDate(today.getDate() + offset * 7 - today.getDay());
-  sun.setHours(0,0,0,0);
-  return sun;
-}
-function formatDate(d) { return `${d.getDate()} ${MONTHS_FR[d.getMonth()]}`; }
-function changeWeek(dir) { weekOffset = Math.max(0, weekOffset + dir); render(); }
-
-/* ── Clé ── */
-function getKey(d, meal) { return `${weekOffset}_${d}_${meal}`; }
-
-/* ── Sélections ── */
-function selectLoc(d, meal, loc) {
-  const k = getKey(d, meal);
-  selections[k] = { loc };
-  render();
-}
-function selectWho(d, meal, val) {
-  const k = getKey(d, meal);
-  if (!selections[k]) selections[k] = {};
-  selections[k].who = val;
-  render();
-}
-function selectGamelle(d, meal, val) {
-  const k = getKey(d, meal);
-  if (!selections[k]) selections[k] = {};
-  // toggle
-  selections[k].gamelle = selections[k].gamelle === val ? null : val;
-  if (selections[k].gamelle) selections[k].libre = '';
-  render();
-}
-function updateLibre(d, meal, val) {
-  const k = getKey(d, meal);
-  if (!selections[k]) selections[k] = {};
-  selections[k].libre = val;
-  if (val) selections[k].gamelle = null;
+function formatDate(d) {
+  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" });
 }
 
-/* ── Progression ── */
-function isFilled(sel, p) {
-  if (!sel || !sel.loc) return false;
-  if (p.who.includes(sel.loc) && !sel.who) return false;
-  if (p.gamelle.includes(sel.loc) && !sel.gamelle && !sel.libre) return false;
+function formatDateLong(d) {
+  return d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+}
+
+function changerSemaine(delta) {
+  offsetSemaine += delta;
+  if (offsetSemaine < 1) offsetSemaine = 1;
+  mettreAJourSemaine();
+}
+
+function mettreAJourSemaine() {
+  const debut = getDimancheOffset(offsetSemaine);
+  const fin = new Date(debut);
+  fin.setDate(debut.getDate() + 6);
+  document.getElementById("semaine-label").textContent =
+    `Semaine du ${formatDate(debut)} au ${formatDate(fin)}`;
+  donneesRepas = {};
+  construireTableau();
+}
+
+// ─── PERSONNE ────────────────────────────────────────────────────────────────
+function choisirPersonne(el) {
+  document.querySelectorAll(".personne-btn").forEach(b => b.classList.remove("actif"));
+  el.classList.add("actif");
+  personneActive = el.dataset.personne;
+  document.getElementById("alerte-personne").style.display = "none";
+  donneesRepas = {};
+  construireTableau();
+}
+
+// ─── TABLEAU ─────────────────────────────────────────────────────────────────
+function construireTableau() {
+  const tbody = document.getElementById("tbody-repas");
+  tbody.innerHTML = "";
+  const debut = getDimancheOffset(offsetSemaine);
+
+  JOURS.forEach((jour, idx) => {
+    const dateJour = new Date(debut);
+    dateJour.setDate(debut.getDate() + idx);
+    const dateStr = formatDate(dateJour);
+
+    const tr = document.createElement("tr");
+    if (jour.cls) tr.className = jour.cls;
+
+    // Colonne jour
+    const tdJour = document.createElement("td");
+    tdJour.innerHTML = `<div class="jour-label">${jour.label}</div><div class="date-label">${dateStr}</div>`;
+    tr.appendChild(tdJour);
+
+    MOMENTS.forEach(moment => {
+      const td = document.createElement("td");
+      const cle = `${jour.id}-${moment}`;
+      td.innerHTML = construireChoix(cle, moment);
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+function construireChoix(cle, moment) {
+  const badgeCls = moment === "midi" ? "badge-midi" : "badge-soir";
+  const badgeLabel = moment === "midi" ? "☀️ Midi" : "🌙 Soir";
+
+  let choixHTML = "";
+  if (personneActive === "Jeanne") {
+    choixHTML = `
+      <button class="choix-btn" data-cle="${cle}" data-lieu="Maison" onclick="choisirLieu(this)">🏠 Maison</button>
+      <button class="choix-btn" data-cle="${cle}" data-lieu="Amiens" onclick="choisirLieu(this)">🏙️ Amiens</button>
+      <button class="choix-btn" data-cle="${cle}" data-lieu="Autre" onclick="choisirLieu(this)">❓ Autre</button>
+    `;
+  } else {
+    choixHTML = `
+      <button class="choix-btn" data-cle="${cle}" data-lieu="Maison" onclick="choisirLieu(this)">🏠 Maison</button>
+      <button class="choix-btn" data-cle="${cle}" data-lieu="Lycée" onclick="choisirLieu(this)">🏫 Lycée</button>
+      <button class="choix-btn" data-cle="${cle}" data-lieu="Autre" onclick="choisirLieu(this)">❓ Autre</button>
+    `;
+  }
+
+  const jeanneCompagnie = personneActive === "Jeanne" ? `
+    <div class="jeanne-compagnie" id="compagnie-${cle}">
+      <span class="compagnie-label">👥 Seule ou avec Baptiste ?</span>
+      <button class="sous-btn" data-cle="${cle}" data-val="Seule" onclick="choisirCompagnie(this)">🧍 Seule</button>
+      <button class="sous-btn" data-cle="${cle}" data-val="Avec Baptiste" onclick="choisirCompagnie(this)">👫 Avec Baptiste</button>
+    </div>
+  ` : "";
+
+  return `
+    <div class="repas-select">
+      <span class="moment-badge ${badgeCls}" style="font-size:11px;margin-bottom:4px;">${badgeLabel}</span>
+      <div class="choix-group">${choixHTML}</div>
+      <div class="sous-choix" id="autre-${cle}">
+        <button class="sous-btn" data-cle="${cle}" data-val="Gamelle froide" onclick="choisirSous(this)">🥗 Gamelle froide</button>
+        <button class="sous-btn" data-cle="${cle}" data-val="Sandwich" onclick="choisirSous(this)">🥪 Sandwich</button>
+        <button class="sous-btn" data-cle="${cle}" data-val="Rien" onclick="choisirSous(this)">🚫 Rien</button>
+      </div>
+      ${jeanneCompagnie}
+    </div>
+  `;
+}
+
+function choisirLieu(btn) {
+  const cle = btn.dataset.cle;
+  const lieu = btn.dataset.lieu;
+
+  // Reset boutons du même groupe
+  btn.closest(".choix-group").querySelectorAll(".choix-btn").forEach(b => {
+    b.className = "choix-btn";
+  });
+
+  // Appliquer style selon lieu
+  const clsMap = { "Maison": "sel-maison", "Lycée": "sel-lycee", "Amiens": "sel-amiens", "Autre": "sel-autre" };
+  btn.classList.add(clsMap[lieu] || "sel-autre");
+
+  // Afficher/masquer sous-choix "Autre"
+  const divAutre = document.getElementById(`autre-${cle}`);
+  if (lieu === "Autre") {
+    divAutre.classList.add("visible");
+  } else {
+    divAutre.classList.remove("visible");
+    // Reset sous-choix
+    divAutre.querySelectorAll(".sous-btn").forEach(b => b.className = "sous-btn");
+  }
+
+  // Afficher compagnie pour Jeanne (toujours, quel que soit le lieu)
+  const divCompagnie = document.getElementById(`compagnie-${cle}`);
+  if (divCompagnie) {
+    divCompagnie.classList.add("visible");
+  }
+
+  // Stocker
+  if (!donneesRepas[cle]) donneesRepas[cle] = {};
+  donneesRepas[cle].lieu = lieu;
+  donneesRepas[cle].sousChoix = lieu !== "Autre" ? null : (donneesRepas[cle].sousChoix || null);
+}
+
+function choisirSous(btn) {
+  const cle = btn.dataset.cle;
+  const val = btn.dataset.val;
+
+  btn.closest(".sous-choix").querySelectorAll(".sous-btn").forEach(b => b.className = "sous-btn");
+  const clsMap = { "Gamelle froide": "sel-gamelle", "Sandwich": "sel-sandwich", "Rien": "sel-rien" };
+  btn.classList.add(clsMap[val] || "");
+
+  if (!donneesRepas[cle]) donneesRepas[cle] = {};
+  donneesRepas[cle].sousChoix = val;
+}
+
+function choisirCompagnie(btn) {
+  const cle = btn.dataset.cle;
+  const val = btn.dataset.val;
+
+  btn.closest(".jeanne-compagnie").querySelectorAll(".sous-btn").forEach(b => b.className = "sous-btn");
+  btn.classList.add(val === "Seule" ? "sel-seule" : "sel-baptiste");
+
+  if (!donneesRepas[cle]) donneesRepas[cle] = {};
+  donneesRepas[cle].compagnie = val;
+}
+
+// ─── VALIDATION ───────────────────────────────────────────────────────────────
+function valider() {
+  if (!personneActive) {
+    document.getElementById("alerte-personne").style.display = "block";
+    return false;
+  }
+
+  for (const jour of JOURS) {
+    for (const moment of MOMENTS) {
+      const cle = `${jour.id}-${moment}`;
+      const d = donneesRepas[cle];
+      if (!d || !d.lieu) {
+        document.getElementById("alerte-repas").style.display = "block";
+        document.getElementById("alerte-repas").textContent =
+          `⚠️ Merci de renseigner le repas du ${jour.label} ${moment}.`;
+        return false;
+      }
+      if (d.lieu === "Autre" && !d.sousChoix) {
+        document.getElementById("alerte-repas").style.display = "block";
+        document.getElementById("alerte-repas").textContent =
+          `⚠️ Précise le type de repas (gamelle/sandwich/rien) pour le ${jour.label} ${moment}.`;
+        return false;
+      }
+      if (personneActive === "Jeanne" && !d.compagnie) {
+        document.getElementById("alerte-repas").style.display = "block";
+        document.getElementById("alerte-repas").textContent =
+          `⚠️ Précise si tu seras seule ou avec Baptiste pour le ${jour.label} ${moment}.`;
+        return false;
+      }
+    }
+  }
+
+  document.getElementById("alerte-repas").style.display = "none";
   return true;
 }
-function countFilled() {
-  if (!author) return 0;
-  const p = profile();
-  let n = 0;
-  for (let d = 0; d < 7; d++)
-    for (const meal of MEALS)
-      if (isFilled(selections[getKey(d, meal)], p)) n++;
-  return n;
-}
 
-/* ── Rendu ── */
-function render() {
-  const sun = getSundayOfWeek(weekOffset);
-  const endSat = new Date(sun); endSat.setDate(sun.getDate() + 6);
-  const isSameMonth = sun.getMonth() === endSat.getMonth();
-  document.getElementById('weekLabel').textContent = isSameMonth
-    ? `${sun.getDate()} – ${endSat.getDate()} ${MONTHS_FR[endSat.getMonth()]} ${endSat.getFullYear()}`
-    : `${formatDate(sun)} – ${formatDate(endSat)} ${endSat.getFullYear()}`;
+// ─── SOUMISSION ───────────────────────────────────────────────────────────────
+async function soumettre() {
+  if (!valider()) return;
 
-  const filled = countFilled();
-  document.getElementById('progressLabel').textContent = `${filled} / 14 repas renseignés`;
-  document.getElementById('progressFill').style.width = `${Math.round(filled/14*100)}%`;
+  document.querySelector(".btn-submit").style.display = "none";
+  document.getElementById("loading").style.display = "block";
 
-  const p = profile();
-  const grid = document.getElementById('daysGrid');
-  grid.innerHTML = '';
+  const debut = getDimancheOffset(offsetSemaine);
+  const payload = {
+    personne: personneActive,
+    semaine: debut.toISOString().split("T")[0], // YYYY-MM-DD du dimanche
+    repas: donneesRepas,
+  };
 
-  for (let d = 0; d < 7; d++) {
-    const date = new Date(sun); date.setDate(sun.getDate() + d);
-    const card = document.createElement('div');
-    card.className = 'day-card';
-    let mealsHTML = '';
-
-    for (let m = 0; m < MEALS.length; m++) {
-      const meal = MEALS[m];
-      const k = getKey(d, meal);
-      const sel = selections[k] || {};
-
-      // Boutons lieux
-      let locBtns = '';
-      if (p) {
-        locBtns = p.locs.map(loc => {
-          const slug = loc.toLowerCase().replace(/é/g,'e');
-          const active = sel.loc === loc ? `sel-${slug}` : '';
-          return `<button class="loc-btn ${active}" onclick="selectLoc(${d},'${meal}','${loc}')">${loc}</button>`;
-        }).join('');
-      } else {
-        locBtns = `<span style="font-size:0.8rem;color:#aaa;font-style:italic">Choisissez un auteur d'abord</span>`;
-      }
-
-      // Sous-menu Seul/À2 (vert)
-      let whoHTML = '';
-      if (p && sel.loc && p.who.includes(sel.loc)) {
-        const btns = WHO_OPTIONS.map(w =>
-          `<button class="sub-btn green-theme ${sel.who===w?'selected':''}" onclick="selectWho(${d},'${meal}','${w}')">${w==='Seule / Seul'?'👤 ':'👥 '}${w}</button>`
-        ).join('');
-        whoHTML = `<div class="sub-detail green visible"><div class="sub-row">${btns}</div></div>`;
-      }
-
-      // Sous-menu Gamelle (orange)
-      let gamelleHTML = '';
-      if (p && sel.loc && p.gamelle.includes(sel.loc)) {
-        const gBtns = GAMELLE_OPTIONS.map(g => {
-          const icons = {'Gamelle froide':'🍱','Sandwich':'🥪'};
-          return `<button class="sub-btn orange-theme ${sel.gamelle===g?'selected':''}" onclick="selectGamelle(${d},'${meal}','${g}')">${icons[g]} ${g}</button>`;
-        }).join('');
-        const libreVal = sel.libre || '';
-        gamelleHTML = `
-          <div class="sub-detail orange visible">
-            <div class="sub-section-label">Repas prévu</div>
-            <div class="sub-row">
-              ${gBtns}
-            </div>
-            <div class="sub-row" style="margin-top:4px">
-              <input class="free-input" type="text" placeholder="✏️ Autre (saisie libre)…"
-                value="${libreVal}"
-                oninput="updateLibre(${d},'${meal}',this.value)"
-                onfocus="selectGamelle(${d},'${meal}',null)"
-              />
-            </div>
-          </div>`;
-      }
-
-      mealsHTML += `
-        ${m > 0 ? '<div class="divider"></div>' : ''}
-        <div class="meal-row">
-          <div class="meal-label">${meal==='Midi'?'🌞 Midi':'🌙 Soir'}</div>
-          <div class="location-btns">${locBtns}</div>
-          ${whoHTML}
-          ${gamelleHTML}
-        </div>`;
-    }
-
-    card.innerHTML = `
-      <div class="day-header">
-        ${DAYS_FR[date.getDay()]}
-        <span class="day-date">${formatDate(date)}</span>
-      </div>
-      <div class="meals">${mealsHTML}</div>`;
-    grid.appendChild(card);
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    afficherResultat(true);
+  } catch (e) {
+    afficherResultat(false);
   }
 }
 
-/* ── Construire le récap texte ── */
-function buildMessage() {
-  const p = profile();
-  const sun = getSundayOfWeek(weekOffset);
-  const endSat = new Date(sun); endSat.setDate(sun.getDate() + 6);
-  let msg = `📅 Planning de ${author} – semaine du ${formatDate(sun)} au ${formatDate(endSat)}\n`;
-  msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
-  for (let d = 0; d < 7; d++) {
-    const date = new Date(sun); date.setDate(sun.getDate() + d);
-    msg += `\n*${DAYS_FR[date.getDay()]} ${date.getDate()}/${date.getMonth()+1}*\n`;
-    for (const meal of MEALS) {
-      const sel = selections[getKey(d, meal)] || {};
-      const icon = meal === 'Midi' ? '🌞' : '🌙';
-      let detail = sel.loc || '—';
-      if (sel.loc) {
-        const extras = [];
-        if (p.who.includes(sel.loc) && sel.who) extras.push(sel.who);
-        const repas = sel.gamelle || sel.libre;
-        if (p.gamelle.includes(sel.loc) && repas) extras.push(repas);
-        if (extras.length) detail += ` (${extras.join(', ')})`;
-      }
-      msg += `  ${icon} ${meal} : ${detail}\n`;
-    }
-  }
-  return msg.trim();
-}
+function afficherResultat(ok) {
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("result-panel").style.display = "block";
 
-/* ── WhatsApp ── */
-function sendWhatsApp() {
-  if (!author) { alert('Merci de choisir qui remplit ce planning.'); return; }
-  const phone = document.getElementById('phoneInput').value.trim().replace(/\D/g,'');
-  if (!phone) { alert('Merci de saisir un numéro WhatsApp.'); return; }
-  const confirmMsg = `✅ Le planning repas de la semaine a été saisi par ${author}.`;
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(confirmMsg)}`, '_blank');
-}
+  const debut = getDimancheOffset(offsetSemaine);
+  const fin = new Date(debut);
+  fin.setDate(debut.getDate() + 6);
 
-/* ── Google Sheets ── */
-function buildSheetsPayload() {
-  const p = profile();
-  const sun = getSundayOfWeek(weekOffset);
-  const endSat = new Date(sun); endSat.setDate(sun.getDate() + 6);
-  const auteurSheets = author === 'Papa' ? 'Hervé' : author;
-  const semaineLabel = `${sun.getDate()}/${sun.getMonth()+1} – ${endSat.getDate()}/${endSat.getMonth()+1} ${endSat.getFullYear()}`;
-  const rows = [];
-  for (let d = 0; d < 7; d++) {
-    const date = new Date(sun); date.setDate(sun.getDate() + d);
-    const dateStr = `${DAYS_FR[date.getDay()].toLowerCase()} ${date.getDate()}/${String(date.getMonth()+1).padStart(2,'0')}`;
-    for (const meal of MEALS) {
-      const sel = selections[getKey(d, meal)] || {};
-      const repas = sel.gamelle || sel.libre || '';
-      rows.push({
-        auteur:   auteurSheets,
-        semaine:  semaineLabel,
-        date:     dateStr,
-        jour:     DAYS_FR[date.getDay()],
-        repas:    meal,
-        lieu:     sel.loc || '',
-        qui:      sel.who || '',
-        gamelle:  repas
-      });
-    }
-  }
-  return rows;
-}
+  document.getElementById("result-msg").textContent =
+    `Planning de ${personneActive} — semaine du ${formatDate(debut)} au ${formatDate(fin)}`;
 
-function sendSheets() {
-  if (!author) { alert('Merci de choisir qui remplit ce planning.'); return; }
-  const btn = document.querySelector('.btn-sheets');
-  const statusEl = document.getElementById('statusMsg');
-  btn.disabled = true;
-  btn.textContent = '⏳ Envoi en cours…';
-  statusEl.className = 'status-msg';
+  const msgCourt = `${personneActive} a rempli le planning repas de la semaine du ${formatDate(debut)} au ${formatDate(fin)}.`;
+  document.getElementById("msg-envoi-txt").textContent = `📋 Message de notification : "${msgCourt}"`;
 
-  const rows = buildSheetsPayload();
-  fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'payload=' + encodeURIComponent(JSON.stringify(rows))
-  })
-  .then(() => {
-    statusEl.className = 'status-msg ok';
-    statusEl.textContent = '✅ Planning envoyé dans Google Sheets !';
-  })
-  .catch(e => {
-    statusEl.className = 'status-msg err';
-    statusEl.textContent = '❌ Erreur : ' + e.message;
-  })
-  .finally(() => {
-    btn.disabled = false;
-    btn.textContent = '📊 Envoyer vers Google Sheets';
-  });
-}
+  window._msgNotif = msgCourt;
 
-/* ── Copier numéro ── */
-function copyPhone() {
-  const val = document.getElementById('phoneInput').value;
-  navigator.clipboard.writeText('+' + val).then(() => {
-    const btn = document.getElementById('copyBtn');
-    const hint = document.getElementById('copyHint');
-    btn.classList.add('copied'); btn.textContent = '✅';
-    hint.textContent = 'Numéro copié !';
-    setTimeout(() => {
-      btn.classList.remove('copied'); btn.textContent = '📋';
-      hint.textContent = '+33 6 79 81 58 01';
-    }, 2000);
-  });
-}
-
-/* ── Reset ── */
-function resetAll() {
-  if (confirm('Réinitialiser toutes les sélections ?')) {
-    selections = {}; author = '';
-    document.querySelectorAll('.author-btn').forEach(b => b.classList.remove('selected'));
-    document.getElementById('statusMsg').className = 'status-msg';
-    render();
+  const statutDiv = document.getElementById("statuts-envoi");
+  if (ok) {
+    statutDiv.innerHTML = `<span class="statut statut-ok">✔ Google Sheets</span> Données enregistrées avec succès.`;
+  } else {
+    statutDiv.innerHTML = `<span class="statut statut-err">✖ Google Sheets</span> Erreur lors de l'envoi. Vérifiez l'URL Apps Script.`;
   }
 }
 
-render();
+// ─── WHATSAPP ─────────────────────────────────────────────────────────────────
+function ouvrirWA(e) {
+  e.preventDefault();
+  const msg = encodeURIComponent(window._msgNotif || "Planning repas rempli.");
+  const url = `https://wa.me/${WA_NUMERO.replace(/\+/g, "")}?text=${msg}`;
+  window.open(url, "_blank");
+  document.getElementById("statuts-envoi").innerHTML +=
+    `<br><span class="statut statut-ok">✔ WhatsApp</span> Ouvert dans WhatsApp.`;
+}
+
+// ─── MAIL ─────────────────────────────────────────────────────────────────────
+async function envoyerMail() {
+  const debut = getDimancheOffset(offsetSemaine);
+  const fin = new Date(debut);
+  fin.setDate(debut.getDate() + 6);
+
+  // Envoi via Apps Script (endpoint dédié mail)
+  const payload = {
+    action: "notifMail",
+    destinataire: MAIL_NOTIF,
+    personne: personneActive,
+    semaineDu: formatDate(debut),
+    semaineAu: formatDate(fin),
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    document.getElementById("statuts-envoi").innerHTML +=
+      `<br><span class="statut statut-ok">✔ Mail</span> Notification envoyée à ${MAIL_NOTIF}.`;
+  } catch (e) {
+    document.getElementById("statuts-envoi").innerHTML +=
+      `<br><span class="statut statut-err">✖ Mail</span> Erreur lors de l'envoi du mail.`;
+  }
+}
+
+// ─── RESET ────────────────────────────────────────────────────────────────────
+function recommencer() {
+  personneActive = null;
+  donneesRepas = {};
+  document.querySelectorAll(".personne-btn").forEach(b => b.classList.remove("actif"));
+  document.getElementById("result-panel").style.display = "none";
+  document.querySelector(".btn-submit").style.display = "block";
+  mettreAJourSemaine();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+mettreAJourSemaine();
 </script>
 </body>
 </html>
