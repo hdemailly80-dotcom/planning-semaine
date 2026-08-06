@@ -266,6 +266,10 @@ function updateLibre(d, meal, val) {
   if (!selections[k]) selections[k] = {};
   selections[k].libre = val;
   if (val) selections[k].gamelle = null;
+  // Mettre à jour la progression sans recréer le DOM
+  const filled = countFilled();
+  document.getElementById('progressLabel').textContent = filled + ' / 14 repas renseignés';
+  document.getElementById('progressFill').style.width = Math.round(filled/14*100) + '%';
 }
 
 /* ── Progression ── */
@@ -352,7 +356,6 @@ function render() {
               <input class="free-input" type="text" placeholder="✏️ Autre (saisie libre)…"
                 value="${libreVal}"
                 oninput="updateLibre(${d},'${meal}',this.value)"
-                onfocus="selectGamelle(${d},'${meal}',null)"
               />
             </div>
           </div>`;
