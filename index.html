@@ -3,396 +3,560 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Planning de la semaine</title>
+<title>Repas de la semaine</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #F0F4F1; min-height: 100vh; padding: 20px 12px 40px; color: #2C3E35; }
-  header { text-align: center; margin-bottom: 24px; }
-  header h1 { font-size: 1.5rem; font-weight: 700; color: #2C3E35; letter-spacing: -0.5px; }
-  header p { font-size: 0.85rem; color: #6B8070; margin-top: 4px; }
-
-  .card { max-width: 540px; margin: 0 auto 16px; background: white; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-
-  .section-label { font-size: 0.75rem; font-weight: 700; color: #6B8070; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
-
-  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
-
-  .btn { padding: 8px 16px; border-radius: 22px; border: 2px solid #D0DDD5; background: white; color: #4A6055; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-  .btn:hover { border-color: #3D5A80; color: #3D5A80; }
-  .btn.sel-blue  { background: #3D5A80; border-color: #3D5A80; color: white; }
-  .btn.sel-green { background: #7AAB8A; border-color: #7AAB8A; color: white; }
-  .btn.sel-orange{ background: #E07B54; border-color: #E07B54; color: white; }
-
-  .week-nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 18px; }
-  .week-nav button { background: #3D5A80; color: white; border: none; border-radius: 8px; width: 36px; height: 36px; font-size: 1.2rem; cursor: pointer; }
-  .week-label { font-size: 0.95rem; font-weight: 600; color: #3D5A80; min-width: 210px; text-align: center; }
-
-  .progress-label { text-align: center; font-size: 0.75rem; color: #6B8070; margin-bottom: 6px; }
-  .progress-bar { background: #E8F0EA; border-radius: 6px; height: 6px; margin-bottom: 16px; overflow: hidden; max-width: 540px; margin-left: auto; margin-right: auto; }
-  .progress-fill { background: #7AAB8A; height: 100%; border-radius: 6px; transition: width 0.3s; }
-
-  .days-grid { display: flex; flex-direction: column; gap: 10px; max-width: 540px; margin: 0 auto; }
-  .day-card { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-  .day-header { background: #3D5A80; color: white; padding: 8px 14px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-  .day-date { font-size: 0.75rem; opacity: 0.75; font-weight: 400; }
-  .meals { padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; }
-  .meal-row { display: flex; flex-direction: column; gap: 6px; }
-  .meal-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #6B8070; }
-  .divider { height: 1px; background: #EDF2EE; margin: 2px 0; }
-
-  .loc-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-  .loc-btn { padding: 6px 13px; border-radius: 20px; border: 2px solid #D0DDD5; background: white; color: #4A6055; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
-  .loc-btn:hover { border-color: #3D5A80; color: #3D5A80; }
-  .loc-btn.s-maison  { background: #7AAB8A; border-color: #7AAB8A; color: white; }
-  .loc-btn.s-amiens  { background: #3D5A80; border-color: #3D5A80; color: white; }
-  .loc-btn.s-lycee   { background: #3D5A80; border-color: #3D5A80; color: white; }
-  .loc-btn.s-autre   { background: #E07B54; border-color: #E07B54; color: white; }
-
-  .sub { display: none; gap: 6px; flex-wrap: wrap; margin-top: 4px; padding: 8px 10px; border-radius: 10px; }
-  .sub.show { display: flex; flex-direction: column; }
-  .sub.green { background: #F0F7F2; border-left: 3px solid #7AAB8A; }
-  .sub.orange { background: #FEF4EF; border-left: 3px solid #E07B54; }
-  .sub-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-
-  .sub-btn { padding: 5px 11px; border-radius: 16px; border: 2px solid; background: white; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
-  .sub-btn.g { border-color: #7AAB8A; color: #3D6B4F; }
-  .sub-btn.g.sel { background: #3D6B4F; border-color: #3D6B4F; color: white; }
-  .sub-btn.o { border-color: #E07B54; color: #C0582A; }
-  .sub-btn.o.sel { background: #E07B54; border-color: #E07B54; color: white; }
-
-  .free-input { flex: 1; min-width: 140px; padding: 5px 10px; border: 2px solid #E07B54; border-radius: 16px; font-size: 0.8rem; color: #2C3E35; outline: none; background: white; }
-  .free-input:focus { border-color: #C0582A; }
-  .free-input::placeholder { color: #bbb; }
-
-  .send-card { max-width: 540px; margin: 20px auto 0; background: white; border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-  .send-card h2 { font-size: 0.9rem; font-weight: 700; color: #2C3E35; margin-bottom: 12px; }
-  .phone-row { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
-  .phone-row input { flex: 1; padding: 9px 12px; border: 2px solid #D0DDD5; border-radius: 10px; font-size: 0.9rem; color: #2C3E35; outline: none; }
-  .phone-row input:focus { border-color: #3D5A80; }
-  .copy-btn { padding: 8px 12px; border-radius: 10px; border: 2px solid #D0DDD5; background: white; font-size: 1rem; cursor: pointer; }
-  .copy-btn.ok { background: #7AAB8A; border-color: #7AAB8A; color: white; }
-  .phone-hint { font-size: 0.72rem; color: #6B8070; margin-bottom: 10px; }
-  .btn-wa { width: 100%; padding: 13px; background: #25D366; color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 8px; }
-  .btn-wa:hover { background: #1ebe59; }
-  .btn-gs { width: 100%; padding: 13px; background: #34A853; color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 8px; }
-  .btn-gs:hover { background: #2d9148; }
-  .btn-gs:disabled { background: #9dcfaa; cursor: not-allowed; }
-  .btn-reset { width: 100%; padding: 9px; background: transparent; color: #6B8070; border: 1px solid #D0DDD5; border-radius: 10px; font-size: 0.85rem; cursor: pointer; }
-  .status { font-size: 0.82rem; text-align: center; padding: 8px; border-radius: 8px; margin-top: 8px; display: none; }
-  .status.ok  { background: #E8F7ED; color: #2d7a47; display: block; }
-  .status.err { background: #FEE8E8; color: #c0392b; display: block; }
+  :root{
+    --green-deep:#1f5f45;
+    --green:#2e7d5b;
+    --green-soft:#c9e4d8;
+    --green-pale:#eef6f1;
+    --cream:#faf8f3;
+    --ink:#233229;
+    --ink-soft:#5c6b62;
+    --amber:#d98e3f;
+    --rose:#c1546a;
+    --line:#dbe6de;
+    --white:#ffffff;
+    --radius:14px;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    padding:20px 14px 60px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:18px;
+  }
+  header h1{
+    font-size:1.4rem;margin:0;color:var(--green-deep);
+    display:flex;align-items:center;gap:8px;
+  }
+  .gear-btn{
+    background:var(--white);border:1px solid var(--line);border-radius:10px;
+    width:38px;height:38px;font-size:1.1rem;cursor:pointer;
+  }
+  .card{
+    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px;
+  }
+  .card h2{margin:0 0 10px;font-size:1rem;color:var(--green-deep);}
+  .author-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .author-btn{
+    border:2px solid var(--line);background:var(--white);border-radius:12px;
+    padding:12px 4px;cursor:pointer;text-align:center;font-weight:600;font-size:.92rem;
+    color:var(--ink-soft);transition:all .15s;
+  }
+  .author-btn .emoji{display:block;font-size:1.5rem;margin-bottom:4px;}
+  .author-btn.active{
+    border-color:var(--green);background:var(--green-pale);color:var(--green-deep);
+  }
+  .week-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .week-nav button.arrow{
+    background:var(--green-pale);border:1px solid var(--green-soft);border-radius:10px;
+    width:36px;height:36px;font-size:1rem;cursor:pointer;color:var(--green-deep);
+  }
+  .week-label{
+    flex:1;min-width:180px;text-align:center;font-weight:700;color:var(--green-deep);
+    background:var(--green-pale);border-radius:10px;padding:8px 10px;font-size:.95rem;
+  }
+  .week-nav input[type=date]{
+    border:1px solid var(--line);border-radius:10px;padding:7px 8px;font-size:.85rem;
+  }
+  .today-btn{
+    border:1px solid var(--green-soft);background:var(--white);color:var(--green-deep);
+    border-radius:10px;padding:7px 10px;cursor:pointer;font-size:.85rem;font-weight:600;
+  }
+  .day-block{margin-bottom:14px;}
+  .day-title{
+    font-weight:700;color:var(--green-deep);margin:0 0 8px;font-size:.98rem;
+    border-bottom:2px solid var(--green-soft);padding-bottom:4px;
+  }
+  .meal-row{
+    display:grid;grid-template-columns:70px 1fr;gap:10px;align-items:start;margin-bottom:10px;
+  }
+  .meal-label{font-weight:600;color:var(--ink-soft);padding-top:8px;font-size:.9rem;}
+  .option-row{display:flex;gap:6px;flex-wrap:wrap;}
+  .opt-btn{
+    border:1.5px solid var(--line);background:var(--white);border-radius:9px;
+    padding:7px 11px;cursor:pointer;font-size:.85rem;color:var(--ink);
+  }
+  .opt-btn.active{border-color:var(--green);background:var(--green-pale);color:var(--green-deep);font-weight:600;}
+  .sub-row{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .sub-row .opt-btn{font-size:.8rem;padding:5px 9px;}
+  .free-text{
+    margin-top:6px;width:100%;border:1px solid var(--line);border-radius:8px;
+    padding:6px 8px;font-size:.85rem;font-family:inherit;
+  }
+  .missing{outline:2px solid var(--rose);border-radius:10px;}
+  .actions{display:flex;gap:10px;margin-top:18px;}
+  .btn-primary{
+    flex:1;background:var(--green);color:var(--white);border:none;border-radius:12px;
+    padding:14px;font-size:1rem;font-weight:700;cursor:pointer;
+  }
+  .btn-secondary{
+    background:var(--white);color:var(--ink-soft);border:1.5px solid var(--line);
+    border-radius:12px;padding:14px 18px;font-size:.95rem;cursor:pointer;font-weight:600;
+  }
+  .alert-banner{
+    background:#fbeaea;border:1px solid var(--rose);color:#8a2e42;
+    border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.88rem;display:none;
+  }
+  .success-banner{
+    background:var(--green-pale);border:1px solid var(--green-soft);color:var(--green-deep);
+    border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.9rem;display:none;font-weight:600;
+  }
+  .send-section{display:none;}
+  .send-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+  .send-row input[type=text]{
+    flex:1;min-width:150px;border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-size:.88rem;
+  }
+  .send-row button{
+    border:none;border-radius:9px;padding:9px 14px;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--white);
+  }
+  .wa-btn{background:#25923f;}
+  .mail-btn{background:var(--amber);}
+  .settings-panel{display:none;}
+  .settings-panel input{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-size:.85rem;}
+  .settings-panel button{margin-top:8px;background:var(--green);color:#fff;border:none;border-radius:9px;padding:9px 14px;font-weight:700;cursor:pointer;}
+  .hint{font-size:.78rem;color:var(--ink-soft);margin-top:6px;}
+  .locked-note{font-size:.82rem;color:var(--ink-soft);text-align:center;margin-top:10px;}
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<header>
-  <h1>📅 Planning de la semaine</h1>
-  <p>Indiquez où vous serez pour chaque repas</p>
-</header>
+  <header>
+    <h1>🍽️ Repas de la semaine</h1>
+    <button class="gear-btn" id="gearBtn" title="Réglages">⚙️</button>
+  </header>
 
-<div class="card">
-  <div class="section-label">Qui remplit ce planning ?</div>
-  <div class="btn-row" id="authorBtns">
-    <button class="btn" onclick="setAuthor('Jeanne')">🧒 Jeanne</button>
-    <button class="btn" onclick="setAuthor('Louis')">🧒 Louis</button>
-    <button class="btn" onclick="setAuthor('Papa')">👨 Papa</button>
-    <button class="btn" onclick="setAuthor('Maman')">👩 Maman</button>
+  <div class="card settings-panel" id="settingsPanel">
+    <h2>Réglages — URL de l'application Web (Apps Script)</h2>
+    <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+    <div class="hint">Colle ici l'URL fournie après le déploiement du script Google Apps Script (voir Code.gs).</div>
+    <button id="saveUrlBtn">Enregistrer</button>
   </div>
-</div>
 
-<div class="week-nav">
-  <button onclick="changeWeek(-1)">‹</button>
-  <div class="week-label" id="weekLabel"></div>
-  <button onclick="changeWeek(1)">›</button>
-</div>
+  <div class="alert-banner" id="alertBanner"></div>
+  <div class="success-banner" id="successBanner"></div>
 
-<div class="progress-label" id="progLabel">0 / 14 repas renseignés</div>
-<div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
-
-<div class="days-grid" id="daysGrid"></div>
-
-<div class="send-card">
-  <h2>📤 Envoyer le récapitulatif</h2>
-  <div class="phone-row">
-    <input type="tel" id="phoneInput" value="33679815801">
-    <button class="copy-btn" id="copyBtn" onclick="copyPhone()">📋</button>
+  <div class="card">
+    <h2>Qui remplit le formulaire ?</h2>
+    <div class="author-grid" id="authorGrid">
+      <button class="author-btn" data-author="jeanne"><span class="emoji">🧒</span>Jeanne</button>
+      <button class="author-btn" data-author="louis"><span class="emoji">🧒</span>Louis</button>
+      <button class="author-btn" data-author="papa"><span class="emoji">👨</span>Papa</button>
+      <button class="author-btn" data-author="maman"><span class="emoji">👩</span>Maman</button>
+    </div>
   </div>
-  <p class="phone-hint" id="phoneHint">+33 6 79 81 58 01</p>
-  <button class="btn-wa" onclick="sendWA()">💬 Envoyer sur WhatsApp</button>
-  <button class="btn-gs" id="btnGS" onclick="sendGS()">📊 Envoyer vers Google Sheets</button>
-  <button class="btn-reset" onclick="resetAll()">🔄 Réinitialiser</button>
-  <div class="status" id="statusMsg"></div>
+
+  <div class="card">
+    <h2>Semaine</h2>
+    <div class="week-nav">
+      <button class="arrow" id="prevWeek">◀</button>
+      <div class="week-label" id="weekLabel">—</div>
+      <button class="arrow" id="nextWeek">▶</button>
+    </div>
+    <div class="week-nav" style="margin-top:8px;">
+      <input type="date" id="datePicker">
+      <button class="today-btn" id="todayBtn">Semaine en cours</button>
+    </div>
+  </div>
+
+  <div class="card" id="daysContainer"><!-- généré en JS --></div>
+
+  <div class="actions">
+    <button class="btn-secondary" id="resetBtn">↺ Réinitialiser</button>
+    <button class="btn-primary" id="sendBtn">Envoyer</button>
+  </div>
+
+  <div class="card send-section" id="sendSection">
+    <h2>📤 Envoyer le récapitulatif</h2>
+    <div class="send-row">
+      <input type="text" id="waNumber" value="33679815801">
+      <button class="wa-btn" id="waBtn">Envoyer sur WhatsApp</button>
+    </div>
+    <div class="send-row">
+      <input type="text" id="mailAddress" value="cindy.demailly.cd@gmail.com" disabled>
+      <button class="mail-btn" id="mailBtn">Envoyer par mail</button>
+    </div>
+    <div class="hint">Ouvre WhatsApp / ta messagerie avec le message déjà rempli — il ne reste qu'à confirmer l'envoi.</div>
+  </div>
+
+  <div class="locked-note" id="urlWarning" style="display:none;">
+    ⚠️ Aucune URL d'application Web n'est configurée. Clique sur ⚙️ en haut pour la renseigner avant de pouvoir envoyer.
+  </div>
+
 </div>
 
 <script>
-// ── Config ──────────────────────────────────────────────────────────────────
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyxFg7TGb9K-uX5OX7EsfsLKASqPKZ0oVGozrbSKG7St5DBEeKKfZOHFAw20gNu1Tp3/exec';
+const DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const MEALS = [['midi','Midi'],['soir','Soir']];
 
-const DAYS    = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-const MONTHS  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-const MEALS   = ['Midi','Soir'];
-
-// Profil par auteur : lieux proposés, sous-menu "qui", sous-menu "repas prévu"
-const PROFILES = {
-  Jeanne: { locs:['Maison','Amiens','Autre'],  who:true,  repas:true  },
-  Louis:  { locs:['Maison','Lycée','Autre'],   who:false, repas:true  },
-  Papa:   { locs:['Maison','Lycée','Autre'],   who:false, repas:true  },
-  Maman:  { locs:['Maison','Lycée','Autre'],   who:false, repas:true  },
+const LOCATIONS = {
+  jeanne: [['maison','🏠 Maison'],['amiens','🏙️ Amiens'],['autre','❓ Autre']],
+  louis:  [['maison','🏠 Maison'],['lycee','🏫 Lycée'],['autre','❓ Autre']],
+  papa:   [['maison','🏠 Maison'],['lycee','🏫 Lycée'],['autre','❓ Autre']],
+  maman:  [['maison','🏠 Maison'],['lycee','🏫 Lycée'],['autre','❓ Autre']],
 };
+const AUTHOR_LABELS = {jeanne:'Jeanne', louis:'Louis', papa:'Papa', maman:'Maman'};
 
-// ── État ────────────────────────────────────────────────────────────────────
-let author = '';
-let weekOffset = 0;
-let sel = {}; // clé: "wOff_dayIdx_meal" → {loc, who, gamelle, libre}
+let state = {
+  author: null,
+  weekStart: getSunday(new Date()),
+  entries: {} // key "d_meal" -> {location, companionship, autreType, autreText}
+};
+let scriptUrl = 'https://script.google.com/macros/s/AKfycbxAN9NCXB7laRay2kzmNcDm_0BALWTZ7OUjxmTEU8ceAEeYe1cWgbcJl_nW2pQLATvy/exec';
 
-// ── Auteur ──────────────────────────────────────────────────────────────────
-function setAuthor(name) {
-  author = name;
-  document.querySelectorAll('#authorBtns .btn').forEach(b => {
-    b.className = 'btn' + (b.textContent.includes(name) ? ' sel-blue' : '');
-  });
-  sel = {};
-  render();
+// ---------- utils dates ----------
+function getSunday(d){
+  const date = new Date(d);
+  const day = date.getDay(); // 0 = dimanche
+  date.setDate(date.getDate() - day);
+  date.setHours(0,0,0,0);
+  return date;
+}
+function addDays(d,n){ const r = new Date(d); r.setDate(r.getDate()+n); return r; }
+function fmtFR(d){
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+}
+function fmtShort(d){
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+}
+function isoDate(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 
-function profile() { return author ? PROFILES[author] : null; }
-
-// ── Semaine ──────────────────────────────────────────────────────────────────
-function getSunday(offset) {
-  const d = new Date();
-  d.setDate(d.getDate() - d.getDay() + offset * 7);
-  d.setHours(0,0,0,0);
-  return d;
-}
-function fmtDate(d) { return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
-function fmtDateShort(d) { return d.getDate() + '/' + (d.getMonth()+1); }
-function changeWeek(dir) { weekOffset = Math.max(-4, weekOffset + dir); render(); }
-
-// ── Clé ─────────────────────────────────────────────────────────────────────
-function key(d, m) { return weekOffset + '_' + d + '_' + m; }
-
-// ── Sélections ───────────────────────────────────────────────────────────────
-function setLoc(d, m, loc) {
-  const k = key(d,m);
-  sel[k] = { loc, who:'', gamelle:'', libre:'' };
-  render();
-}
-function setWho(d, m, val) {
-  if (!sel[key(d,m)]) sel[key(d,m)] = {};
-  sel[key(d,m)].who = val;
-  updateProgress();
-}
-function setGamelle(d, m, val) {
-  const k = key(d,m);
-  if (!sel[k]) sel[k] = {};
-  sel[k].gamelle = sel[k].gamelle === val ? '' : val;
-  sel[k].libre = '';
-  // Mettre à jour visuellement les boutons gamelle
-  document.querySelectorAll('[data-gam="'+k+'"]').forEach(b => {
-    b.classList.toggle('sel', b.dataset.val === sel[k].gamelle);
-  });
-  updateProgress();
-}
-function setLibre(d, m, val) {
-  const k = key(d,m);
-  if (!sel[k]) sel[k] = {};
-  sel[k].libre = val;
-  if (val) sel[k].gamelle = '';
-  document.querySelectorAll('[data-gam="'+k+'"]').forEach(b => b.classList.remove('sel'));
-  updateProgress();
-}
-
-// ── Progression ──────────────────────────────────────────────────────────────
-function isFilled(k) {
-  const p = profile(); if (!p) return false;
-  const s = sel[k]; if (!s || !s.loc) return false;
-  if (p.who && !s.who) return false;
-  if (p.repas && s.loc === 'Autre' && !s.gamelle && !s.libre) return false;
-  return true;
-}
-function updateProgress() {
-  if (!author) return;
-  let n = 0;
-  for (let d = 0; d < 7; d++)
-    for (const m of MEALS)
-      if (isFilled(key(d,m))) n++;
-  document.getElementById('progLabel').textContent = n + ' / 14 repas renseignés';
-  document.getElementById('progFill').style.width = Math.round(n/14*100) + '%';
-}
-
-// ── Rendu ────────────────────────────────────────────────────────────────────
-function render() {
-  const sun = getSunday(weekOffset);
-  const sat = new Date(sun); sat.setDate(sun.getDate()+6);
-  document.getElementById('weekLabel').textContent =
-    sun.getDate() + (sun.getMonth()===sat.getMonth() ? '' : ' '+MONTHS[sun.getMonth()])
-    + ' – ' + sat.getDate() + ' ' + MONTHS[sat.getMonth()] + ' ' + sat.getFullYear();
-
-  updateProgress();
-  const p = profile();
-  const grid = document.getElementById('daysGrid');
-  grid.innerHTML = '';
-
-  for (let d = 0; d < 7; d++) {
-    const date = new Date(sun); date.setDate(sun.getDate()+d);
-    const card = document.createElement('div');
-    card.className = 'day-card';
-
-    let mealsHTML = '';
-    for (let mi = 0; mi < MEALS.length; mi++) {
-      const meal = MEALS[mi];
-      const k = key(d, meal);
-      const s = sel[k] || {};
-
-      // Boutons lieux
-      let locHTML = '';
-      if (p) {
-        locHTML = p.locs.map(loc => {
-          const slug = loc.toLowerCase().replace(/é/g,'e');
-          const active = s.loc === loc ? ' s-'+slug : '';
-          return `<button class="loc-btn${active}" onclick="setLoc(${d},'${meal}','${loc}')">${loc}</button>`;
-        }).join('');
-      } else {
-        locHTML = '<span style="font-size:0.8rem;color:#aaa;font-style:italic">Choisissez un auteur d\'abord</span>';
-      }
-
-      // Sous-menu Qui (vert) — Jeanne uniquement
-      let whoHTML = '';
-      if (p && p.who && s.loc) {
-        const w1 = s.who === 'Seule / Seul' ? ' sel' : '';
-        const w2 = s.who === 'À 2' ? ' sel' : '';
-        whoHTML = `<div class="sub green show">
-          <div class="sub-row">
-            <button class="sub-btn g${w1}" onclick="setWho(${d},'${meal}','Seule / Seul')">👤 Seule / Seul</button>
-            <button class="sub-btn g${w2}" onclick="setWho(${d},'${meal}','À 2')">👥 À 2</button>
-          </div>
-        </div>`;
-      }
-
-      // Sous-menu Repas (orange) — si "Autre"
-      let repasHTML = '';
-      if (p && p.repas && s.loc === 'Autre') {
-        const g1 = s.gamelle === 'Gamelle froide' ? ' sel' : '';
-        const g2 = s.gamelle === 'Sandwich' ? ' sel' : '';
-        repasHTML = `<div class="sub orange show">
-          <div class="sub-row">
-            <button class="sub-btn o${g1}" data-gam="${k}" data-val="Gamelle froide" onclick="setGamelle(${d},'${meal}','Gamelle froide')">🍱 Gamelle froide</button>
-            <button class="sub-btn o${g2}" data-gam="${k}" data-val="Sandwich" onclick="setGamelle(${d},'${meal}','Sandwich')">🥪 Sandwich</button>
-          </div>
-          <div class="sub-row" style="margin-top:4px">
-            <input class="free-input" type="text" placeholder="✏️ Autre (saisie libre)…"
-              value="${s.libre || ''}"
-              oninput="setLibre(${d},'${meal}',this.value)" />
-          </div>
-        </div>`;
-      }
-
-      mealsHTML += `
-        ${mi > 0 ? '<div class="divider"></div>' : ''}
-        <div class="meal-row">
-          <div class="meal-label">${meal === 'Midi' ? '🌞 Midi' : '🌙 Soir'}</div>
-          <div class="loc-btns">${locHTML}</div>
-          ${whoHTML}${repasHTML}
-        </div>`;
+// ---------- storage config ----------
+// Compatible avec l'aperçu Claude (window.storage) ET un hébergement
+// classique type GitHub Pages (repli sur localStorage du navigateur).
+async function storageGet(key){
+  try{
+    if(window.storage && typeof window.storage.get === 'function'){
+      const r = await window.storage.get(key, false);
+      return r ? r.value : null;
     }
-
-    card.innerHTML = `
-      <div class="day-header">${DAYS[date.getDay()]} <span class="day-date">${fmtDate(date)}</span></div>
-      <div class="meals">${mealsHTML}</div>`;
-    grid.appendChild(card);
-  }
+  }catch(e){}
+  try{ return localStorage.getItem(key); }catch(e){ return null; }
+}
+async function storageSet(key, value){
+  try{
+    if(window.storage && typeof window.storage.set === 'function'){
+      await window.storage.set(key, value, false);
+      return;
+    }
+  }catch(e){}
+  try{ localStorage.setItem(key, value); }catch(e){}
 }
 
-// ── Payload pour Google Sheets ───────────────────────────────────────────────
-function buildPayload() {
-  const sun = getSunday(weekOffset);
-  const sat = new Date(sun); sat.setDate(sun.getDate()+6);
-  const semaine = fmtDateShort(sun) + ' – ' + fmtDateShort(sat) + ' ' + sat.getFullYear();
-  const auteurGS = author === 'Papa' ? 'Hervé' : author;
-  const rows = [];
+async function loadConfig(){
+  const stored = await storageGet('config:scriptUrl');
+  if (stored) scriptUrl = stored;
+  document.getElementById('scriptUrlInput').value = scriptUrl;
+  document.getElementById('urlWarning').style.display = scriptUrl ? 'none' : 'block';
+}
+async function saveConfig(url){
+  scriptUrl = url.trim();
+  await storageSet('config:scriptUrl', scriptUrl);
+  document.getElementById('urlWarning').style.display = scriptUrl ? 'none' : 'block';
+}
 
-  for (let d = 0; d < 7; d++) {
-    const date = new Date(sun); date.setDate(sun.getDate()+d);
-    const dateStr = DAYS[date.getDay()].toLowerCase() + ' ' + fmtDateShort(date);
-    for (const meal of MEALS) {
-      const s = sel[key(d,meal)] || {};
-      rows.push({
-        auteur:  auteurGS,
-        semaine: semaine,
-        date:    dateStr,
-        jour:    DAYS[date.getDay()],
-        repas:   meal,
-        lieu:    s.loc    || '',
-        qui:     s.who    || '',
-        gamelle: s.gamelle || s.libre || ''
+// ---------- rendu ----------
+function renderWeekLabel(){
+  const end = addDays(state.weekStart,6);
+  document.getElementById('weekLabel').textContent = 'Semaine du '+fmtFR(state.weekStart)+' au '+fmtFR(end);
+  document.getElementById('datePicker').value = isoDate(state.weekStart);
+}
+
+function renderAuthors(){
+  document.querySelectorAll('.author-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.author === state.author);
+  });
+}
+
+function entryKey(d,mealKey){ return d+'_'+mealKey; }
+
+function renderDays(){
+  const container = document.getElementById('daysContainer');
+  if(!state.author){
+    container.innerHTML = '<p class="hint">Choisis d\'abord qui remplit le formulaire ci-dessus.</p>';
+    return;
+  }
+  const locOptions = LOCATIONS[state.author];
+  let html = '';
+  for(let d=0; d<7; d++){
+    const date = addDays(state.weekStart, d);
+    html += `<div class="day-block"><p class="day-title">${DAYS_FR[d]} ${fmtShort(date)}</p>`;
+    MEALS.forEach(([mealKey, mealLabel])=>{
+      const key = entryKey(d, mealKey);
+      const entry = state.entries[key] || {};
+      html += `<div class="meal-row"><div class="meal-label">${mealLabel}</div><div>`;
+      html += `<div class="option-row" data-key="${key}" data-role="location">`;
+      locOptions.forEach(([val,label])=>{
+        html += `<button type="button" class="opt-btn loc-btn ${entry.location===val?'active':''}" data-key="${key}" data-value="${val}">${label}</button>`;
+      });
+      html += `</div>`;
+
+      if(state.author === 'jeanne'){
+        html += `<div class="sub-row" data-key="${key}" data-role="companionship">`;
+        html += `<button type="button" class="opt-btn comp-btn ${entry.companionship==='seule'?'active':''}" data-key="${key}" data-value="seule">Seule</button>`;
+        html += `<button type="button" class="opt-btn comp-btn ${entry.companionship==='a2'?'active':''}" data-key="${key}" data-value="a2">À 2</button>`;
+        html += `</div>`;
+      }
+
+      if(entry.location === 'autre'){
+        html += `<div class="sub-row" data-key="${key}" data-role="autreType">`;
+        html += `<button type="button" class="opt-btn autre-btn ${entry.autreType==='gamelle'?'active':''}" data-key="${key}" data-value="gamelle">🥗 Gamelle froide</button>`;
+        html += `<button type="button" class="opt-btn autre-btn ${entry.autreType==='sandwich'?'active':''}" data-key="${key}" data-value="sandwich">🥪 Sandwich</button>`;
+        html += `<button type="button" class="opt-btn autre-btn ${entry.autreType==='libre'?'active':''}" data-key="${key}" data-value="libre">✏️ Préciser</button>`;
+        html += `</div>`;
+        if(entry.autreType === 'libre'){
+          html += `<input type="text" class="free-text" data-key="${key}" placeholder="Précise ici..." value="${(entry.autreText||'').replace(/"/g,'&quot;')}">`;
+        }
+      }
+
+      html += `</div></div>`;
+    });
+    html += `</div>`;
+  }
+  container.innerHTML = html;
+  attachDayHandlers();
+}
+
+function attachDayHandlers(){
+  document.querySelectorAll('.loc-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key = btn.dataset.key, value = btn.dataset.value;
+      if(!state.entries[key]) state.entries[key] = {};
+      const cur = state.entries[key];
+      if(cur.location === value){
+        // désélectionner
+        state.entries[key] = { companionship: cur.companionship || null };
+      } else {
+        cur.location = value;
+        if(value !== 'autre'){ cur.autreType = null; cur.autreText = null; }
+      }
+      renderDays();
+    });
+  });
+  document.querySelectorAll('.comp-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key = btn.dataset.key, value = btn.dataset.value;
+      if(!state.entries[key]) state.entries[key] = {};
+      state.entries[key].companionship = state.entries[key].companionship === value ? null : value;
+      renderDays();
+    });
+  });
+  document.querySelectorAll('.autre-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key = btn.dataset.key, value = btn.dataset.value;
+      const cur = state.entries[key];
+      cur.autreType = cur.autreType === value ? null : value;
+      if(cur.autreType !== 'libre') cur.autreText = null;
+      renderDays();
+    });
+  });
+  document.querySelectorAll('.free-text').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const key = inp.dataset.key;
+      state.entries[key].autreText = inp.value;
+    });
+  });
+}
+
+// ---------- validation ----------
+function validate(){
+  const problems = [];
+  if(!state.author) problems.push("Choisis qui remplit le formulaire.");
+  if(state.author){
+    for(let d=0; d<7; d++){
+      MEALS.forEach(([mealKey, mealLabel])=>{
+        const key = entryKey(d, mealKey);
+        const entry = state.entries[key];
+        if(!entry || !entry.location){
+          problems.push(DAYS_FR[d]+' — '+mealLabel+' : choisis un endroit.');
+          return;
+        }
+        if(state.author === 'jeanne' && !entry.companionship){
+          problems.push(DAYS_FR[d]+' — '+mealLabel+' : précise si Jeanne est seule ou à 2.');
+        }
+        if(entry.location === 'autre'){
+          if(!entry.autreType){
+            problems.push(DAYS_FR[d]+' — '+mealLabel+' : précise gamelle, sandwich ou saisie libre.');
+          } else if(entry.autreType === 'libre' && !(entry.autreText||'').trim()){
+            problems.push(DAYS_FR[d]+' — '+mealLabel+' : complète le champ libre.');
+          }
+        }
       });
     }
   }
-  return rows;
+  return problems;
 }
 
-// ── WhatsApp ─────────────────────────────────────────────────────────────────
-function sendWA() {
-  if (!author) { alert('Choisissez d\'abord qui remplit ce planning.'); return; }
-  const phone = document.getElementById('phoneInput').value.replace(/\D/g,'');
-  if (!phone) { alert('Numéro WhatsApp manquant.'); return; }
-  const msg = '✅ Le planning repas de la semaine a été saisi par ' + author + '.';
-  window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+function showAlert(msgs){
+  const el = document.getElementById('alertBanner');
+  el.innerHTML = '⚠️ ' + msgs.slice(0,6).join('<br>⚠️ ') + (msgs.length>6 ? '<br>… et '+(msgs.length-6)+' autre(s).' : '');
+  el.style.display = 'block';
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function hideAlert(){ document.getElementById('alertBanner').style.display = 'none'; }
+function showSuccess(msg){
+  const el = document.getElementById('successBanner');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideSuccess(){ document.getElementById('successBanner').style.display = 'none'; }
+
+// ---------- résumé texte pour whatsapp / mail ----------
+function buildSummaryText(){
+  const end = addDays(state.weekStart,6);
+  let lines = [];
+  lines.push('📋 Formulaire repas rempli par '+AUTHOR_LABELS[state.author]);
+  lines.push('Semaine du '+fmtFR(state.weekStart)+' au '+fmtFR(end));
+  lines.push('');
+  for(let d=0; d<7; d++){
+    const date = addDays(state.weekStart, d);
+    let dayLine = DAYS_FR[d]+' '+fmtShort(date)+' : ';
+    const parts = [];
+    MEALS.forEach(([mealKey, mealLabel])=>{
+      const entry = state.entries[entryKey(d,mealKey)];
+      if(!entry || !entry.location) return;
+      let label = ({maison:'Maison', lycee:'Lycée', amiens:'Amiens', autre:'Autre'})[entry.location];
+      if(entry.location === 'autre' && entry.autreType){
+        label += ' ('+({gamelle:'gamelle froide', sandwich:'sandwich', libre:entry.autreText})[entry.autreType]+')';
+      }
+      if(entry.companionship){
+        label += entry.companionship==='seule' ? ' – seule' : ' – à 2';
+      }
+      parts.push(mealLabel+': '+label);
+    });
+    dayLine += parts.join(' | ');
+    lines.push(dayLine);
+  }
+  return lines.join('\n');
 }
 
-// ── Google Sheets ─────────────────────────────────────────────────────────────
-function sendGS() {
-  if (!author) { alert('Choisissez d\'abord qui remplit ce planning.'); return; }
-  const btn = document.getElementById('btnGS');
-  const status = document.getElementById('statusMsg');
-  btn.disabled = true;
-  btn.textContent = '⏳ Envoi en cours…';
-  status.className = 'status';
+// ---------- envoi ----------
+async function sendForm(){
+  hideAlert(); hideSuccess();
+  const problems = validate();
+  if(problems.length){ showAlert(problems); return; }
+  if(!scriptUrl){
+    showAlert(["Configure d'abord l'URL de l'application Web (icône ⚙️ en haut)."]);
+    return;
+  }
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Envoi en cours...';
 
-  const rows = buildPayload();
-  fetch(GAS_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'payload=' + encodeURIComponent(JSON.stringify(rows))
-  })
-  .then(() => {
-    status.className = 'status ok';
-    status.textContent = '✅ Planning envoyé dans Google Sheets !';
-  })
-  .catch(err => {
-    status.className = 'status err';
-    status.textContent = '❌ Erreur : ' + err.message;
-  })
-  .finally(() => {
-    btn.disabled = false;
-    btn.textContent = '📊 Envoyer vers Google Sheets';
-  });
+  const payload = {
+    author: state.author,
+    weekStart: isoDate(state.weekStart),
+    entries: state.entries
+  };
+
+  try{
+    const res = await fetch(scriptUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(data && data.ok){
+      showSuccess('✅ Formulaire envoyé pour '+AUTHOR_LABELS[state.author]+' — semaine du '+fmtFR(state.weekStart)+' au '+fmtFR(addDays(state.weekStart,6))+'.');
+      if(state.author !== 'maman'){
+        document.getElementById('sendSection').style.display = 'block';
+      }
+    } else {
+      showAlert(["Erreur lors de l'envoi : "+(data && data.error ? data.error : 'réponse invalide.')]);
+    }
+  }catch(err){
+    showAlert(["Impossible de contacter le serveur. Vérifie l'URL configurée (⚙️) et ta connexion."]);
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Envoyer';
+  }
 }
 
-// ── Copier numéro ─────────────────────────────────────────────────────────────
-function copyPhone() {
-  navigator.clipboard.writeText('+' + document.getElementById('phoneInput').value).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✅'; btn.classList.add('ok');
-    document.getElementById('phoneHint').textContent = 'Numéro copié !';
-    setTimeout(() => {
-      btn.textContent = '📋'; btn.classList.remove('ok');
-      document.getElementById('phoneHint').textContent = '+33 6 79 81 58 01';
-    }, 2000);
-  });
+function resetForm(){
+  state.author = null;
+  state.entries = {};
+  hideAlert(); hideSuccess();
+  document.getElementById('sendSection').style.display = 'none';
+  renderAuthors();
+  renderDays();
 }
 
-// ── Reset ─────────────────────────────────────────────────────────────────────
-function resetAll() {
-  if (!confirm('Réinitialiser toutes les sélections ?')) return;
-  author = ''; sel = {};
-  document.querySelectorAll('#authorBtns .btn').forEach(b => b.className = 'btn');
-  document.getElementById('statusMsg').className = 'status';
-  render();
-}
+// ---------- événements ----------
+document.getElementById('authorGrid').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.author-btn');
+  if(!btn) return;
+  const newAuthor = btn.dataset.author;
+  if(state.author !== newAuthor){
+    state.author = newAuthor;
+    state.entries = {}; // les options changent selon l'auteur -> on repart propre
+  }
+  hideAlert(); hideSuccess();
+  document.getElementById('sendSection').style.display = 'none';
+  renderAuthors();
+  renderDays();
+});
 
-render();
+document.getElementById('prevWeek').addEventListener('click', ()=>{
+  state.weekStart = addDays(state.weekStart, -7);
+  renderWeekLabel();
+});
+document.getElementById('nextWeek').addEventListener('click', ()=>{
+  state.weekStart = addDays(state.weekStart, 7);
+  renderWeekLabel();
+});
+document.getElementById('todayBtn').addEventListener('click', ()=>{
+  state.weekStart = getSunday(new Date());
+  renderWeekLabel();
+});
+document.getElementById('datePicker').addEventListener('change', (e)=>{
+  const val = e.target.value;
+  if(!val) return;
+  const [y,m,dd] = val.split('-').map(Number);
+  state.weekStart = getSunday(new Date(y, m-1, dd));
+  renderWeekLabel();
+});
+
+document.getElementById('resetBtn').addEventListener('click', resetForm);
+document.getElementById('sendBtn').addEventListener('click', sendForm);
+
+document.getElementById('gearBtn').addEventListener('click', ()=>{
+  const panel = document.getElementById('settingsPanel');
+  panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+});
+document.getElementById('saveUrlBtn').addEventListener('click', async ()=>{
+  await saveConfig(document.getElementById('scriptUrlInput').value);
+  document.getElementById('settingsPanel').style.display = 'none';
+});
+
+document.getElementById('waBtn').addEventListener('click', ()=>{
+  const num = document.getElementById('waNumber').value.replace(/\D/g,'');
+  const text = encodeURIComponent(buildSummaryText());
+  window.open('https://wa.me/'+num+'?text='+text, '_blank');
+});
+document.getElementById('mailBtn').addEventListener('click', ()=>{
+  const subject = encodeURIComponent('Récap repas — '+AUTHOR_LABELS[state.author]+' — semaine du '+fmtFR(state.weekStart));
+  const body = encodeURIComponent(buildSummaryText());
+  window.location.href = 'mailto:cindy.demailly.cd@gmail.com?subject='+subject+'&body='+body;
+});
+
+// ---------- init ----------
+(async function init(){
+  await loadConfig();
+  renderWeekLabel();
+  renderAuthors();
+  renderDays();
+})();
 </script>
 </body>
 </html>
