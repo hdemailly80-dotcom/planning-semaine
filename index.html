@@ -199,7 +199,7 @@ const DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samed
 const MEALS = [['midi','Midi'],['soir','Soir']];
 
 const LOCATIONS = {
-  jeanne: [['maison','🏠 Maison'],['amiens','🏙️ Amiens'],['autre','❓ Autre']],
+  jeanne: [['maison','🏠 Maison'],['amiens','🏙️ Amiens'],['baptiste','🧑\u200d🤝\u200d🧑 Chez Baptiste'],['autre','❓ Autre']],
   louis:  [['maison','🏠 Maison'],['lycee','🏫 Lycée'],['autre','❓ Autre']],
   papa:   [['maison','🏠 Maison'],['lycee','🏫 Lycée'],['autre','❓ Autre']],
   maman:  [['maison','🏠 Maison'],['lycee','🏫 Lycée'],['autre','❓ Autre']],
@@ -302,7 +302,7 @@ function renderDays(){
       });
       html += `</div>`;
 
-      if(state.author === 'jeanne'){
+      if(state.author === 'jeanne' && entry.location !== 'baptiste'){
         html += `<div class="sub-row" data-key="${key}" data-role="companionship">`;
         html += `<button type="button" class="opt-btn comp-btn ${entry.companionship==='seule'?'active':''}" data-key="${key}" data-value="seule">Seule</button>`;
         html += `<button type="button" class="opt-btn comp-btn ${entry.companionship==='a2'?'active':''}" data-key="${key}" data-value="a2">À 2</button>`;
@@ -340,6 +340,7 @@ function attachDayHandlers(){
       } else {
         cur.location = value;
         if(value !== 'autre'){ cur.autreType = null; cur.autreText = null; }
+        if(value === 'baptiste'){ cur.companionship = null; }
       }
       renderDays();
     });
@@ -382,7 +383,7 @@ function validate(){
           problems.push(DAYS_FR[d]+' — '+mealLabel+' : choisis un endroit.');
           return;
         }
-        if(state.author === 'jeanne' && !entry.companionship){
+        if(state.author === 'jeanne' && entry.location !== 'baptiste' && !entry.companionship){
           problems.push(DAYS_FR[d]+' — '+mealLabel+' : précise si Jeanne est seule ou à 2.');
         }
         if(entry.location === 'autre'){
@@ -426,7 +427,7 @@ function buildSummaryText(){
     MEALS.forEach(([mealKey, mealLabel])=>{
       const entry = state.entries[entryKey(d,mealKey)];
       if(!entry || !entry.location) return;
-      let label = ({maison:'Maison', lycee:'Lycée', amiens:'Amiens', autre:'Autre'})[entry.location];
+      let label = ({maison:'Maison', lycee:'Lycée', amiens:'Amiens', baptiste:'Chez Baptiste', autre:'Autre'})[entry.location];
       if(entry.location === 'autre' && entry.autreType){
         label += ' ('+({gamelle:'gamelle froide', sandwich:'sandwich', libre:entry.autreText})[entry.autreType]+')';
       }
